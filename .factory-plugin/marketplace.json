@@ -1,0 +1,16 @@
+{
+  "name": "pvstack",
+  "description": "PV Stack: Lauren Tan's pstack for Droid, with model routing chosen from VulcanBench data.",
+  "owner": {
+    "name": "PV Stack contributors"
+  },
+  "plugins": [
+    {
+      "name": "pvstack",
+      "description": "Rigorous agent workflows (poteto-mode, how, why, interrogate, arena, and more) with per-role models picked from VulcanBench. Balanced and Budget modes.",
+      "source": "./plugins/pvstack",
+      "category": "developer-tools",
+      "tags": ["workflow", "principles", "review", "model-routing"]
+    }
+  ]
+}

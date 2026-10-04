@@ -1,0 +1,10 @@
+{
+  "name": "pvstack",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "sync": "node tools/sync-upstream.mjs",
+    "droids": "node tools/droids.mjs",
+    "check": "node tools/sync-upstream.mjs --check && node tools/droids.mjs --check && node tools/validate.mjs"
+  }
+}
