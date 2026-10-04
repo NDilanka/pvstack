@@ -12,13 +12,13 @@ Write `~/.factory/pvstack-models.md`. This is the role sheet that `poteto-mode` 
 
 ### 1. Load current state
 
-If `~/.factory/pvstack-models.md` exists, read it. Its `# mode:` line is the current mode, and any line that differs from that mode's sheet in `modes/` is a user override. A role label that is in neither `modes/balanced.md` nor `modes/budget.md` is retired: drop it and list it in step 4.
+If `~/.factory/pvstack-models.md` exists, read it. Its `# mode:` line is the current mode. Its `# overrides:` line lists the roles the user chose. Every other line that differs from that mode's sheet in `modes/` is a stale default from an older plugin version: replace it with the sheet's value and tell the user which roles changed. A role label that is in neither `modes/balanced.md` nor `modes/budget.md` is retired: drop it and tell the user. An override whose droid exists in none of the plugin's `droids/`, `~/.factory/droids/` or `.factory/droids/` is also retired: replace it with the sheet's value and tell the user.
 
 ### 2. Pick a mode
 
 Explain both modes in plain words, then ask with `AskUser`. Name the current mode if there is one.
 
-- **Balanced** (default). GPT-6.1 Sol handles code work. Claude Opus 5.5 handles judgment, prose and the hardest changes. Review panels use Opus, Sol and Grok 4.7.
+- **Balanced** (default). GPT-6.1 Sol handles code work. Claude Opus 5.5 handles judgment and prose. Grok 4.7 at extra-high effort takes the hardest changes. Review panels use Opus, Sol and Grok 4.7.
 - **Budget**. DeepSeek V4.1 Flash, an open model, handles code, search and mechanical work. Opus 5.5 at medium effort keeps judgment and prose. GPT-6.1 Sol handles reflect tooling. Opus is dropped from the fan-out panels but still writes the synthesis.
 
 Start the working table from `modes/<mode>.md`. On a re-run with the same mode, keep the user's overrides. When the mode changes, ask whether to keep or drop each override.
