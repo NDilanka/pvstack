@@ -1,0 +1,91 @@
+name: upstream sync
+
+# Weekly: sync to upstream pstack main, push the result to the upstream-sync branch,
+# and open (or update) an issue with a link to open the pull request.
+# The workflow does not open the pull request itself because the repository keeps
+# "Allow GitHub Actions to create and approve pull requests" turned off.
+
+on:
+  schedule:
+    - cron: "23 5 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency: upstream-sync
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      BRANCH: upstream-sync
+      TITLE: Upstream pstack update available
+      COMPARE: ${{ github.server_url }}/${{ github.repository }}/compare/main...upstream-sync?expand=1
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Sync to upstream main
+        run: node tools/sync-upstream.mjs --ref main
+
+      - name: Push branch and report
+        run: |
+          issue=$(gh issue list --state open --json number,title --jq '.[] | select(.title == $ENV.TITLE) | .number' | head -n1)
+
+          # cursor/plugins hosts other plugins too; a new commit that leaves pstack/ alone only moves the pin.
+          if [ -z "$(git status --porcelain -- . ':!UPSTREAM.md')" ]; then
+            echo "main is in sync with upstream."
+            if [ -n "$issue" ]; then gh issue close "$issue" --comment "main is in sync with upstream again."; fi
+            exit 0
+          fi
+
+          set +e
+          npm run check > "$RUNNER_TEMP/check.log" 2>&1
+          status=$?
+          set -e
+          cat "$RUNNER_TEMP/check.log"
+
+          sha=$(sed -n 's/^- Commit: `\([0-9a-f]*\)`$/\1/p' UPSTREAM.md)
+          version=$(sed -n 's/^- Upstream version: //p' UPSTREAM.md)
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898699+github-actions[bot]@users.noreply.github.com"
+          git switch -C "$BRANCH"
+          git add -A
+          git commit --quiet -m "chore: sync upstream pstack ${version} (${sha:0:7})"
+
+          if git fetch --quiet origin "$BRANCH" 2>/dev/null && git diff --quiet FETCH_HEAD HEAD; then
+            echo "$BRANCH already holds this sync."
+            exit 0
+          fi
+          git push --force origin "$BRANCH"
+
+          body="$RUNNER_TEMP/body.md"
+          {
+            echo "Upstream pstack is at ${version} (\`${sha}\`). The sync is on the \`${BRANCH}\` branch."
+            echo
+            echo "[Open the pull request](${COMPARE})"
+            echo
+            if [ "$status" -eq 0 ]; then
+              echo "\`npm run check\` passes on the branch."
+            else
+              echo "\`npm run check\` fails on the branch. Upstream likely added a role line, a model slug, or a Cursor reference that the PV Stack layer does not cover yet. Fix it on the branch before merging."
+            fi
+            echo
+            echo '```text'
+            git diff --stat HEAD~1 | tail -n 40
+            echo
+            tail -n 40 "$RUNNER_TEMP/check.log"
+            echo '```'
+          } > "$body"
+
+          if [ -n "$issue" ]; then
+            gh issue comment "$issue" --body-file "$body"
+          else
+            gh issue create --title "$TITLE" --body-file "$body"
+          fi

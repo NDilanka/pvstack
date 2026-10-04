@@ -72,6 +72,9 @@ for (const dir of fs.readdirSync(skillsDir)) {
   const file = path.join(skillsDir, dir, "SKILL.md");
   if (!fs.existsSync(file)) continue;
   const text = fs.readFileSync(file, "utf8");
+  const name = text.match(/^---\r?\n[\s\S]*?^name:\s*(.*?)\s*$/m)?.[1];
+  if (name !== dir) fail(`${dir}/SKILL.md: name "${name}" must equal its directory name`);
+  if (!/^[a-z0-9-]+$/.test(dir)) fail(`${dir}: skill names use lowercase letters, numbers, and hyphens`);
   for (const m of text.matchAll(/the `([a-z][a-z ,-]+)` line/g)) {
     if (!sheetRoles.has(m[1])) fail(`${dir}/SKILL.md names role line "${m[1]}" that no sheet defines`);
   }

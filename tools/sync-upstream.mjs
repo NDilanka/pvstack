@@ -128,10 +128,28 @@ function toDroid(text) {
   return `---\n${kept.join("\n")}\n---\n${rewrite(body)}`;
 }
 
-// Returns Map<pluginRelativePath, Buffer>.
+// Cursor shows `name` as a display label ("Poteto Mode"); Droid wants the lowercase-hyphen slug users type.
+function slugSkillName(text, dir) {
+  const [fm, body] = splitFrontmatter(text);
+  return fm.replace(/^name:.*$/m, `name: ${dir}`) + body;
+}
+
+// Paths under UPSTREAM_DIR that git records as executable (mode 100755).
+function upstreamExecutables(upstream) {
+  const out = new Set();
+  for (const line of git(upstream, "ls-files", "-s", "--", UPSTREAM_DIR).split("\n")) {
+    const m = line.match(/^100755 \S+ \d+\t(.+)$/);
+    if (m) out.add(m[1].slice(UPSTREAM_DIR.length + 1));
+  }
+  return out;
+}
+
+// Returns { files: Map<pluginRelativePath, Buffer>, exec: Set<pluginRelativePath> }.
 function build(upstream) {
   const src = path.join(upstream, UPSTREAM_DIR);
+  const upExec = upstreamExecutables(upstream);
   const files = new Map();
+  const exec = new Set();
   // A Windows checkout with core.autocrlf yields CRLF; normalize so --check compares the same bytes everywhere.
   const put = (rel, data) => {
     const buf = Buffer.isBuffer(data) ? data : Buffer.from(data, "utf8");
@@ -141,11 +159,14 @@ function build(upstream) {
   for (const rel of walk(path.join(src, "skills"))) {
     if (SKIPPED_SKILLS.has(rel.split("/")[0])) continue;
     const raw = fs.readFileSync(path.join(src, "skills", rel));
+    if (upExec.has(`skills/${rel}`)) exec.add(`skills/${rel}`);
     if (!rel.endsWith(".md")) {
       put(`skills/${rel}`, raw);
       continue;
     }
     let text = rewrite(raw.toString("utf8"));
+    const parts = rel.split("/");
+    if (parts.length === 2 && parts[1] === "SKILL.md") text = slugSkillName(text, parts[0]);
     if (rel.endsWith("/SKILL.md") && NEEDS_NOTE.test(text) && !text.includes(NOTE_MARKER)) {
       const [fm, body] = splitFrontmatter(text);
       text = fm + "\n" + droidNote(rel) + body.replace(/^\r?\n/, "");
@@ -160,11 +181,26 @@ function build(upstream) {
 
   for (const rel of walk(path.join(src, "docs"))) {
     const raw = fs.readFileSync(path.join(src, "docs", rel));
+    if (upExec.has(`docs/${rel}`)) exec.add(`docs/upstream/${rel}`);
     put(`docs/upstream/${rel}`, rel.endsWith(".md") ? rewrite(raw.toString("utf8")) : raw);
   }
 
   put("LICENSE-pstack", fs.readFileSync(path.join(src, "LICENSE")));
-  return files;
+  return { files, exec };
+}
+
+// Modes as recorded in this repo's git index, or null outside a git checkout.
+function indexModes() {
+  try {
+    const out = new Map();
+    for (const line of git(root, "ls-files", "-s", "--", "plugins/pvstack").split("\n")) {
+      const m = line.match(/^(\d{6}) \S+ \d+\tplugins\/pvstack\/(.+)$/);
+      if (m) out.set(m[2], m[1]);
+    }
+    return out;
+  } catch {
+    return null;
+  }
 }
 
 function upstreamVersion(upstream) {
@@ -189,6 +225,8 @@ Update with \`node tools/sync-upstream.mjs --ref main\`, review the diff, then c
 
 - Copies \`skills/\` (except \`setup-pstack\`, replaced by \`setup-pvstack\`), \`agents/\` as Droid droids, and \`docs/\` under \`docs/upstream/\`.
 - Applies the string rewrites listed in \`REWRITES\` in \`tools/sync-upstream.mjs\`.
+- Sets each skill's \`name\` to its directory name, the lowercase slug Droid expects (\`Poteto Mode\` becomes \`poteto-mode\`).
+- Keeps upstream's executable bits; \`--check\` compares them against the git index.
 - Adds a one-line pointer to \`droid-tools.md\` at the top of each skill that names a Cursor tool or model slug.
 - Leaves the Benny automation pack out: it is wired to Cursor automations.
 `;
@@ -199,10 +237,21 @@ function main() {
   const ref = args.ref ?? readPinnedRef();
   const upstream = checkout(ref, args.source);
   const sha = git(upstream, "rev-parse", "HEAD");
-  const files = build(upstream);
+  const { files, exec } = build(upstream);
   const pin = pinText(sha, upstreamVersion(upstream));
   const previous = fs.existsSync(ledgerPath) ? JSON.parse(fs.readFileSync(ledgerPath, "utf8")) : [];
   const ledger = JSON.stringify([...files.keys()], null, 2) + "\n";
+  // Windows checkouts ignore the filesystem exec bit, so the git index is the record that ships.
+  const modes = indexModes();
+  const modeDrift = [];
+  if (modes) {
+    for (const rel of files.keys()) {
+      const want = exec.has(rel) ? "100755" : "100644";
+      const have = modes.get(rel);
+      if (have && have !== want) modeDrift.push(rel);
+    }
+  }
+  const modeFix = (rel) => `git update-index --chmod=${exec.has(rel) ? "+x" : "-x"} plugins/pvstack/${rel}`;
 
   if (args.check) {
     const drift = [];
@@ -210,6 +259,7 @@ function main() {
       const target = path.join(pluginDir, rel);
       if (!fs.existsSync(target) || !fs.readFileSync(target).equals(data)) drift.push(`changed  ${rel}`);
     }
+    for (const rel of modeDrift) drift.push(`mode     ${rel}  (fix: ${modeFix(rel)})`);
     for (const rel of previous) if (!files.has(rel)) drift.push(`stale    ${rel}`);
     if (!fs.existsSync(ledgerPath) || fs.readFileSync(ledgerPath, "utf8") !== ledger) drift.push("changed  .upstream-files.json");
     if (!fs.existsSync(pinPath) || fs.readFileSync(pinPath, "utf8") !== pin) drift.push("changed  UPSTREAM.md");
@@ -231,10 +281,16 @@ function main() {
     const target = path.join(pluginDir, rel);
     fs.mkdirSync(path.dirname(target), { recursive: true });
     fs.writeFileSync(target, data);
+    fs.chmodSync(target, exec.has(rel) ? 0o755 : 0o644);
   }
   fs.writeFileSync(ledgerPath, ledger);
   fs.writeFileSync(pinPath, pin);
   console.log(`Synced ${files.size} files from upstream ${sha.slice(0, 7)}.`);
+  if (modeDrift.length) console.log(`Executable bits differ from upstream in the git index. Run:\n  ${modeDrift.map(modeFix).join("\n  ")}`);
+  if (process.platform === "win32") {
+    const untracked = [...exec].filter((rel) => modes && !modes.has(rel));
+    if (untracked.length) console.log(`New upstream executables. After git add, run:\n  ${untracked.map(modeFix).join("\n  ")}`);
+  }
 }
 
 main();

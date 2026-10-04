@@ -41,7 +41,7 @@ Then, in a Droid session:
 
 `/setup-pvstack` writes `~/.factory/pvstack-models.md`. Without it, PV Stack uses Balanced.
 
-After you edit the plugin source, run `droid plugin update pvstack@pvstack --scope user`. Droid runs the installed copy from its plugin cache, not from this repository.
+To pick up new commits, run `droid plugin update pvstack@pvstack --scope user`. Droid runs the installed copy from its plugin cache, not from a local clone.
 
 In headless `droid exec`, the Task tool is blocked below `--auto high`, so playbooks that delegate do their work in the parent instead. Interactive sessions spawn subagents at any autonomy level.
 
@@ -65,6 +65,8 @@ node tools/sync-upstream.mjs --ref main   # pull Lauren's latest, re-pin
 npm run check                             # sync drift, droids, sheets, links
 ```
 
+A weekly GitHub Action does this for you. When upstream moves, it pushes the sync to the `upstream-sync` branch and opens an issue titled "Upstream pstack update available" with a link to open the pull request and the `npm run check` result. When `main` catches up, it closes the issue. Run it on demand from the Actions tab (workflow `upstream sync`).
+
 The sync rewrites only the files it copied from upstream, which are listed in `plugins/pvstack/.upstream-files.json`. The PV Stack layer is never overwritten:
 
 - `plugins/pvstack/droids/pv-*.md`, generated from `tools/droids.mjs`
@@ -82,6 +84,7 @@ plugins/pvstack/
   docs/upstream/ upstream's pstack guide
 docs/model-evidence.md
 tools/           sync-upstream.mjs, droids.mjs, validate.mjs
+.github/workflows/ check.yml (npm run check), upstream-sync.yml (weekly)
 ```
 
 ## Credits
