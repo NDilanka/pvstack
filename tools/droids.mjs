@@ -2,8 +2,8 @@
 // Writes plugins/pvstack/droids/pv-*.md from CELLS. Each cell is one VulcanBench
 // model x effort column; mode sheets map pstack roles onto these droid names.
 //
-//   node tools/droids.mjs           write the droids
-//   node tools/droids.mjs --check   exit 1 if a droid file differs from CELLS
+//   node tools/droids.mjs           write the droids and delete pv-*.md files not in CELLS
+//   node tools/droids.mjs --check   exit 1 if a droid file differs from CELLS or is not in CELLS
 
 import fs from "node:fs";
 import path from "node:path";
@@ -50,7 +50,8 @@ function main() {
   fs.mkdirSync(droidDir, { recursive: true });
   const names = new Set(CELLS.map((c) => c.name));
   for (const file of fs.readdirSync(droidDir)) {
-    const name = file.replace(/\.md$/, "");
+    if (!file.endsWith(".md")) continue;
+    const name = file.slice(0, -3);
     if (!name.startsWith("pv-") || names.has(name)) continue;
     if (check) drift.push(`${name} (no longer in CELLS)`);
     else fs.rmSync(path.join(droidDir, file));

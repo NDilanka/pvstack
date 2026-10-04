@@ -23,7 +23,7 @@ The reasons and numbers behind each choice are in [docs/model-evidence.md](docs/
 
 - GPT-6.1 Sol at high effort passes every Frontier v4 task at 97% of Opus 5.5's best score, for about 1/10 of the cost.
 - Opus 5.5 at medium effort is within 0.25 points of its best, and it scores higher than its own xhigh and max levels.
-- Grok 4.7 has the top three scores on Frontier v4. At xhigh it scores 93.15 and passes every task, so Balanced gives it the hardest changes. It takes about 2.5 times as long as Sol at high and costs an estimated 7 to 9 times as much, so Sol keeps everyday code.
+- Grok 4.7 has the top three scores on Frontier v4. At xhigh it scores 93.15 and passes every task, so Balanced gives it the hardest changes. Against Sol at high, Grok at high takes about 2.5 times as long and at least 7 times the estimated cost. At xhigh it takes about 2.8 times as long and at least 9 times the cost. So Sol keeps everyday code.
 - DeepSeek V4-Flash was one of the strongest and cheapest cells on VulcanBench's v3 board.
 
 ## Install
