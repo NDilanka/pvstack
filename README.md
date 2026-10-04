@@ -15,14 +15,15 @@ pstack is a set of rigorous engineering workflows. You start a task with `/potet
 | Swarm workers | GPT-6.1 Sol, high | DeepSeek V4.1 Flash, high |
 | Exploration, investigators, mechanical edits | GPT-6.1 Sol, low | DeepSeek V4.1 Flash, low |
 | Judgment, prose, explainers, synthesizers | Claude Opus 5.5, medium | Claude Opus 5.5, medium |
-| Hardest changes | Claude Opus 5.5, high | Claude Opus 5.5, medium |
+| Hardest changes | Grok 4.7, xhigh | Claude Opus 5.5, medium |
 | Reflect tooling | GPT-6.1 Sol, xhigh | GPT-6.1 Sol, high |
-| Review panels (arena, architect, interrogate) | Opus 5.5 · Sol xhigh · Grok 4.7 | Sol high · DeepSeek max · Grok 4.7 |
+| Review panels (arena, architect, interrogate) | Opus 5.5 medium · Sol xhigh · Grok 4.7 high | Sol high · DeepSeek max · Grok 4.7 high |
 
 The reasons and numbers behind each choice are in [docs/model-evidence.md](docs/model-evidence.md). In short:
 
 - GPT-6.1 Sol at high effort passes every Frontier v4 task at 97% of Opus 5.5's best score, for about 1/10 of the cost.
 - Opus 5.5 at medium effort is within 0.25 points of its best, and it scores higher than its own xhigh and max levels.
+- Grok 4.7 has the top three scores on Frontier v4. At xhigh it scores 93.15 and passes every task, so Balanced gives it the hardest changes. It takes about 2.5 times as long as Sol at high and costs an estimated 7 to 9 times as much, so Sol keeps everyday code.
 - DeepSeek V4-Flash was one of the strongest and cheapest cells on VulcanBench's v3 board.
 
 ## Install

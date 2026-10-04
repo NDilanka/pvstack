@@ -59,6 +59,8 @@ for (const [mode, roles] of Object.entries(sheets)) {
   }
   for (const panel of PANELS) if (!roles.has(panel)) fail(`${mode}: missing panel ${panel}`);
 }
+const used = new Set(Object.values(sheets).flatMap((roles) => [...roles.values()].flat()));
+for (const cell of CELLS) if (!used.has(cell.name)) fail(`${cell.name}: no mode sheet uses it; delete the cell`);
 for (const mode of otherModes) {
   const a = [...sheets[firstMode].keys()].join("|");
   const b = [...sheets[mode].keys()].join("|");

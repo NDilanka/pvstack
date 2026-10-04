@@ -8,15 +8,15 @@ perf-issue: pv-sol-high
 hillclimb: pv-sol-high
 mechanical edits: pv-sol-low
 judgment and prose: pv-opus-medium
-hardest tasks: pv-opus-high
+hardest tasks: pv-grok-xhigh
 how explorer: pv-sol-low
 how explainer: pv-opus-medium
 why investigators: pv-sol-low
 why synthesizer: pv-opus-medium
 reflect tooling: pv-sol-xhigh
 reflect judgment, divergent, synthesizer: pv-opus-medium
-arena runners: pv-opus-medium, pv-sol-xhigh, pv-grok-medium
-arena cross-judge pool: pv-opus-medium, pv-sol-xhigh, pv-grok-medium
+arena runners: pv-opus-medium, pv-sol-xhigh, pv-grok-high
+arena cross-judge pool: pv-opus-medium, pv-sol-xhigh, pv-grok-high
 swarm workers: pv-sol-high
-architect runners: pv-opus-medium, pv-sol-xhigh, pv-grok-medium
-interrogate reviewers: pv-opus-medium, pv-sol-xhigh, pv-grok-medium
+architect runners: pv-opus-medium, pv-sol-xhigh, pv-grok-high
+interrogate reviewers: pv-opus-medium, pv-sol-xhigh, pv-grok-high

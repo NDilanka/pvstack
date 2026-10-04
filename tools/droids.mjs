@@ -17,8 +17,8 @@ export const CELLS = [
   { name: "pv-sol-high", model: "gpt-6.1-sol", effort: "high", label: "GPT-6.1 Sol, high effort", use: "Code delegates: feature, refactoring, bug fix, perf, hillclimb, swarm workers." },
   { name: "pv-sol-xhigh", model: "gpt-6.1-sol", effort: "xhigh", label: "GPT-6.1 Sol, extra-high effort", use: "Review panels and reflect tooling where Sol's best score matters." },
   { name: "pv-opus-medium", model: "claude-opus-5-5", effort: "medium", label: "Claude Opus 5.5, medium effort", use: "Judgment, prose, explainers, synthesizers, and review panels." },
-  { name: "pv-opus-high", model: "claude-opus-5-5", effort: "high", label: "Claude Opus 5.5, high effort", use: "The hardest changes: cross-cutting design, concurrency, subtle algorithms." },
-  { name: "pv-grok-medium", model: "grok-4.7", effort: "medium", label: "Grok 4.7, medium effort", use: "Third-lab member of review panels." },
+  { name: "pv-grok-high", model: "grok-4.7", effort: "high", label: "Grok 4.7, high effort", use: "Third-lab member of review panels." },
+  { name: "pv-grok-xhigh", model: "grok-4.7", effort: "xhigh", label: "Grok 4.7, extra-high effort", use: "The hardest changes: cross-cutting design, concurrency, subtle algorithms." },
   { name: "pv-ds-low", model: "deepseek-v4.1-flash", effort: "low", label: "DeepSeek V4.1 Flash, low effort", use: "Budget mode: exploration and mechanical tasks." },
   { name: "pv-ds-high", model: "deepseek-v4.1-flash", effort: "high", label: "DeepSeek V4.1 Flash, high effort", use: "Budget mode: swarm workers." },
   { name: "pv-ds-max", model: "deepseek-v4.1-flash", effort: "max", label: "DeepSeek V4.1 Flash, max effort", use: "Budget mode: code delegates and review panels." },
@@ -48,6 +48,13 @@ function main() {
   const check = process.argv.includes("--check");
   const drift = [];
   fs.mkdirSync(droidDir, { recursive: true });
+  const names = new Set(CELLS.map((c) => c.name));
+  for (const file of fs.readdirSync(droidDir)) {
+    const name = file.replace(/\.md$/, "");
+    if (!name.startsWith("pv-") || names.has(name)) continue;
+    if (check) drift.push(`${name} (no longer in CELLS)`);
+    else fs.rmSync(path.join(droidDir, file));
+  }
   for (const cell of CELLS) {
     const file = path.join(droidDir, `${cell.name}.md`);
     const text = render(cell);
