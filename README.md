@@ -65,7 +65,7 @@ node tools/sync-upstream.mjs --ref main   # pull Lauren's latest, re-pin
 npm run check                             # sync drift, droids, sheets, links
 ```
 
-A weekly GitHub Action does this for you. When upstream moves, it pushes the sync to the `upstream-sync` branch and opens an issue titled "Upstream pstack update available" with a link to open the pull request and the `npm run check` result. When `main` catches up, it closes the issue. Run it on demand from the Actions tab (workflow `upstream sync`).
+A weekly GitHub Action does this for you. When upstream pstack changes, it pushes the sync to the `upstream-sync` branch and opens a pull request with the diff summary and the `npm run check` result. Later upstream changes refresh the same pull request, unless you have pushed your own fixes to the branch; then it only comments. If `main` catches up another way, it closes the pull request. Run it on demand from the Actions tab (workflow `upstream sync`). It needs the repository setting "Allow GitHub Actions to create and approve pull requests".
 
 The sync rewrites only the files it copied from upstream, which are listed in `plugins/pvstack/.upstream-files.json`. The PV Stack layer is never overwritten:
 
