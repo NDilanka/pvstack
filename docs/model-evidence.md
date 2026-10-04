@@ -1,6 +1,6 @@
 # Model evidence
 
-PV Stack picks a model and reasoning effort for every pstack role from VulcanBench's published results. This page records each number it relies on, where the number comes from, and which picks are inferred rather than measured.
+PV Stack picks a model and reasoning effort for every pstack role from the published results of [VulcanBench](https://vulcanbench.com), Morgan Linton's open-source benchmark for real engineering tasks ([methodology](https://vulcanbench.com/methodology.html)). This page records each number it relies on, where the number comes from, and which picks are inferred rather than measured.
 
 Data pulled on 2026-10-04 from:
 

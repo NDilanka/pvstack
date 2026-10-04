@@ -1,6 +1,6 @@
 # Notice
 
-PV Stack includes and modifies pstack by Lauren Tan, from https://github.com/cursor/plugins/tree/main/pstack, under the MIT License. The original license is in `plugins/pvstack/LICENSE-pstack`.
+PV Stack includes and modifies pstack by Lauren Tan ([@poteto](https://github.com/poteto)), from https://github.com/cursor/plugins/tree/main/pstack, under the MIT License. The original license is in `plugins/pvstack/LICENSE-pstack`.
 
 ## Files from pstack
 
@@ -24,4 +24,6 @@ These files are listed in `plugins/pvstack/.upstream-files.json`:
 - `plugins/pvstack/skills/poteto-mode/references/droid-tools.md`
 - `docs/`, `tools/`, manifests, and this repository's README
 
-Benchmark figures in `docs/model-evidence.md` come from VulcanBench (https://vulcanbench.com) by Morgan Linton. They are cited, not redistributed.
+## VulcanBench
+
+The benchmark figures in `docs/model-evidence.md`, and the model choices based on them, come from VulcanBench (https://vulcanbench.com) by Morgan Linton ([@morganlinton](https://github.com/morganlinton), https://www.morganlinton.com). The figures are cited with links to their source reports, not redistributed. The VulcanBench harness is open source at https://github.com/morganlinton/VulcanBench.

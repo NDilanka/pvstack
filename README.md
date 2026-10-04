@@ -86,4 +86,27 @@ tools/           sync-upstream.mjs, droids.mjs, validate.mjs
 
 ## Credits
 
-pstack is by Lauren Tan ([@poteto](https://x.com/poteto)), MIT-licensed. Benchmark data is from Morgan Linton's VulcanBench. See [NOTICE.md](NOTICE.md).
+PV Stack is built on the work of two people. Neither of them is affiliated with this project.
+
+### pstack, by Lauren Tan
+
+Every workflow in PV Stack comes from Lauren Tan's pstack: `poteto-mode`, its playbooks, `how`, `why`, `architect`, `arena`, `interrogate`, and the principle skills. Lauren works at Cursor, previously worked at Meta and Netflix, and is on the React core team, where she helps build React Compiler.
+
+- pstack source: https://github.com/cursor/plugins/tree/main/pstack
+- The pstack guide: https://github.com/cursor/plugins/blob/main/pstack/docs/guide/README.md
+- The Complete Guide to pstack: https://x.com/poteto/article/2094457600259842065
+- GitHub: [@poteto](https://github.com/poteto) · X: [@poteto](https://x.com/poteto)
+
+pstack is MIT-licensed, © 2026 Lauren Tan. Her license is in [`plugins/pvstack/LICENSE-pstack`](plugins/pvstack/LICENSE-pstack), and [NOTICE.md](NOTICE.md) lists which files come from pstack and what PV Stack changes in them.
+
+### VulcanBench, by Morgan Linton
+
+Every model and effort choice in PV Stack comes from VulcanBench, an open-source benchmark for real engineering tasks. It reports token use, time and cost alongside scores. Morgan Linton, cofounder and CTO of Bold Metrics, built it and runs it. PV Stack cites VulcanBench's published numbers in [docs/model-evidence.md](docs/model-evidence.md) and doesn't redistribute its data.
+
+- VulcanBench: https://vulcanbench.com
+- Leaderboard: https://vulcanbench.com/leaderboard.html
+- Methodology: https://vulcanbench.com/methodology.html
+- Open-source harness: https://github.com/morganlinton/VulcanBench
+- Morgan Linton: https://www.morganlinton.com · GitHub: [@morganlinton](https://github.com/morganlinton)
+
+VulcanBench is free and runs on sponsorships. If PV Stack's routing saves you money, consider [sponsoring VulcanBench on GitHub](https://github.com/sponsors/morganlinton).
