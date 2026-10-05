@@ -4,8 +4,8 @@ PV Stack tracks Lauren Tan's pstack directly from Cursor's plugin repository.
 
 - Repository: https://github.com/cursor/plugins
 - Path: `pstack/`
-- Commit: `e43c7ee26e0038c6c1fa8380dd34ce86ff94cb2a`
-- Upstream version: 0.15.9
+- Commit: `4e5b1cf2ccb0ea3716f08c8ee0a5856b5ab93536`
+- Upstream version: 0.15.10
 
 Update with `node tools/sync-upstream.mjs --ref main`, review the diff, then commit.
 `node tools/sync-upstream.mjs --check` fails when the tree has drifted from this pin.
