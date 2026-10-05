@@ -19,7 +19,7 @@ const srcDir = path.join(root, "playbook", "src");
 const outDir = path.join(root, "playbook");
 
 const MODES = ["greenfield", "brownfield"];
-const SECTION_IDS = ["top", "main", "for-agents", "loop", "lines", "greenfield", "brownfield", "platforms", "skills", "principles", "recipes", "pitfalls", "glossary", "routing"];
+const SECTION_IDS = ["top", "main", "for-agents", "loop", "lines", "greenfield", "brownfield", "platforms", "skills", "principles", "recipes", "pitfalls", "glossary", "routing", "toc", "sidebar", "status"];
 
 // Each repo-backed SourceRef kind maps to one file path. "p1"/"p2" style ids resolve through meta.sources.
 const SOURCE_KINDS = [
@@ -170,74 +170,94 @@ function inline(s) {
     .join("");
 }
 
-const promptHtml = (text) => esc(text).replace(/&lt;([^&\s][^&]*?)&gt;/g, '<mark class="ph">&lt;$1&gt;</mark>');
+// Browsers break lines after a hyphen, which splits a wrapped "--flag" into "-" and "-flag".
+const promptHtml = (text) =>
+  esc(text)
+    .replace(/(^|\s)(--?[A-Za-z][\w-]*)/g, '$1<span class="nw">$2</span>')
+    .replace(/&lt;([^&\s][^&]*?)&gt;/g, '<mark class="ph">&lt;$1&gt;</mark>');
 const paras = (list, cls = "") => list.map((p) => `<p${cls ? ` class="${cls}"` : ""}>${inline(p)}</p>`).join("\n");
-const pad2 = (n) => String(n).padStart(2, "0");
 const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
 
 
 const ICON = {
-  copy: '<svg aria-hidden="true" viewBox="0 0 16 16" width="14" height="14"><rect x="5" y="5" width="9" height="9" rx="2" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M3 11V3a1 1 0 0 1 1-1h7" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>',
+  copy: '<svg aria-hidden="true" viewBox="0 0 16 16" width="14" height="14"><rect x="5.5" y="5.5" width="8" height="8" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M3 10.5V3.5A1 1 0 0 1 4 2.5h6.5" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>',
   theme: '<svg aria-hidden="true" viewBox="0 0 16 16" width="16" height="16"><circle cx="8" cy="8" r="6" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M8 2a6 6 0 0 1 0 12z" fill="currentColor"/></svg>',
-  bot: '<svg aria-hidden="true" viewBox="0 0 24 24" width="22" height="22"><rect x="4" y="7" width="16" height="12" rx="3" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M12 3v4M9 12h.01M15 12h.01M9 16h6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>',
+  menu: '<svg aria-hidden="true" viewBox="0 0 16 16" width="16" height="16"><path d="M2 4h12M2 8h12M2 12h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>',
+  close: '<svg aria-hidden="true" viewBox="0 0 16 16" width="16" height="16"><path d="M3.5 3.5l9 9M12.5 3.5l-9 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>',
   repeat: '<svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18"><path d="M4 12a8 8 0 0 1 14-5.3M20 12a8 8 0 0 1-14 5.3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M18 3v4h-4M6 21v-4h4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>',
 };
+
+// Line colors arrive as one hex per line. Each theme gets a variant that passes WCAG AA (4.5:1) as
+// text. The goals carry headroom so the result holds on any paper near white or near black: the
+// light paper is darker than white and the dark paper is lighter than black.
+const LINE_VAR = { greenfield: "gf", brownfield: "bf" };
+const lineVar = (mode) => `var(--${LINE_VAR[mode]})`;
+const rgbOf = (hex) => [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255);
+const hexOf = (rgb) => "#" + rgb.map((c) => Math.round(c * 255).toString(16).padStart(2, "0")).join("");
+const luminance = (rgb) => {
+  const [r, g, b] = rgb.map((c) => (c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4));
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+};
+function legible(hex, theme) {
+  const rgb = rgbOf(hex);
+  const end = theme === "light" ? 0 : 1;
+  for (let t = 0; t <= 1; t += 0.01) {
+    const c = rgb.map((v) => v + (end - v) * t);
+    const L = luminance(c);
+    if (theme === "light" ? 1.05 / (L + 0.05) >= 5 : (L + 0.05) / 0.05 >= 5.6) return hexOf(c);
+  }
+  return theme === "light" ? "#000000" : "#ffffff";
+}
+const lineVars = (C) => MODES.map((m) => `--${LINE_VAR[m]}-l:${legible(C.lines[m].color, "light")};--${LINE_VAR[m]}-d:${legible(C.lines[m].color, "dark")}`).join(";");
 
 const copyButton = (label = "Copy") => `<button type="button" class="copy" data-copy>${ICON.copy}<span>${label}</span></button>`;
 
 function sourcesHtml(C, refs) {
   if (!refs.length) return "";
   const items = refs.map((ref) => resolveSource(C, ref)).map((s) => `<li><a href="${esc(s.url)}">${esc(s.label)}</a></li>`);
-  return `<div class="sources"><span class="sources-label">Sources</span><ul>${items.join("")}</ul></div>`;
+  return `<div class="sources"><span class="meta-label">Sources</span><ul>${items.join("")}</ul></div>`;
 }
 
 function deeperHtml(list) {
   if (!list.length) return "";
-  return `<details class="deeper blueprint"><summary><span>Go deeper</span></summary><div class="deeper-body">${paras(list)}</div></details>`;
+  return `<details class="deeper"><summary>Go deeper</summary><div class="deeper-body">${paras(list)}</div></details>`;
 }
 
-function promptCard(C, p) {
-  const first = C.platforms[0];
+function promptBlock(intent, text, label = "Prompt") {
   return `<figure class="prompt">
-<figcaption><span class="prompt-intent">${inline(p.intent)}</span>${copyButton()}</figcaption>
-<pre><code data-copy-source>${promptHtml(p.text)}</code></pre>
-<p class="prompt-on"><span class="prompt-on-label">On <span data-pf-name>${esc(first.name)}</span></span> <span data-pf-invoke>${inline(first.invoke)}</span></p>
+<figcaption><span class="prompt-label">${intent ? inline(intent) : label}</span>${copyButton()}</figcaption>
+<pre><code data-copy-source>${text}</code></pre>
 </figure>`;
 }
 
-const promptsHtml = (C, list) => (list.length ? `<div class="prompts">${list.map((p) => promptCard(C, p)).join("\n")}</div>` : "");
+const promptsHtml = (list) => list.map((p) => promptBlock(p.intent, promptHtml(p.text))).join("\n");
 
 function stepHtml(C, { step, mode, n, shared }, total) {
   const line = C.lines[mode];
   const other = MODES.find((m) => m !== mode);
-  const sharedNote = shared ? `<span class="shared-badge">Shared with the ${esc(C.lines[other].name)} line</span>` : "";
+  const sharedNote = shared ? ` <span class="shared-note">Shared with ${esc(C.lines[other].name)}</span>` : "";
   const skills = step.skills.length
-    ? `<div class="step-skills"><span class="mini-label">Skills</span><ul class="chips">${step.skills.map((s) => `<li><a class="chip" href="${esc(skillUrl(C, s))}">/${esc(s)}</a></li>`).join("")}</ul></div>`
+    ? `<p class="step-skills"><span class="meta-label">Skills</span> ${step.skills.map((s) => `<a href="${esc(skillUrl(C, s))}"><code>/${esc(s)}</code></a>`).join(" ")}</p>`
     : "";
   const done = step.done.length
-    ? `<section class="done" aria-labelledby="${step.id}-done"><h4 id="${step.id}-done">Done when</h4><ul>${step.done
+    ? `<fieldset class="done"><legend>Done when <span class="progress" data-progress="${step.id}" aria-live="polite">0 of ${step.done.length}</span></legend><ul>${step.done
         .map((d, j) => `<li><label><input type="checkbox" data-done="${step.id}" data-index="${j}"><span>${inline(d)}</span></label></li>`)
-        .join("")}</ul></section>`
+        .join("")}</ul></fieldset>`
     : "";
-  const pitfalls = step.pitfalls.length
-    ? `<section class="step-pitfalls" aria-labelledby="${step.id}-pit"><h4 id="${step.id}-pit">Watch out</h4><ul>${step.pitfalls.map((p) => `<li>${inline(p)}</li>`).join("")}</ul></section>`
-    : "";
-  return `<article class="station reveal${shared ? " is-shared" : ""}" id="${step.id}" data-mode="${mode}" aria-labelledby="${step.id}-h">
-<div class="station-marker" aria-hidden="true"><span>${pad2(n)}</span></div>
-<header class="station-head">
-<p class="station-meta"><span class="station-line">${esc(line.name)} line</span> <span class="station-of">Station ${n} of ${total}</span> <span class="station-name">${esc(step.station)}</span>${sharedNote}</p>
+  const pitfalls = step.pitfalls.length ? `<div class="watch"><h4>Watch out</h4><ul>${step.pitfalls.map((p) => `<li>${inline(p)}</li>`).join("")}</ul></div>` : "";
+  return `<article class="station${shared ? " is-shared" : ""}" id="${step.id}" data-mode="${mode}" aria-labelledby="${step.id}-h">
+<span class="station-marker" aria-hidden="true">${n}</span>
+<header>
+<p class="station-meta">${esc(line.name)} station ${n} of ${total}. ${esc(step.station)}.${sharedNote}</p>
 <h3 id="${step.id}-h">${inline(step.title)}</h3>
-${step.done.length ? `<p class="station-progress" data-progress="${step.id}" aria-live="polite">0 of ${step.done.length} done</p>` : ""}
 </header>
-<div class="station-body">
 ${paras(step.plain)}
-${deeperHtml(step.deeper)}
-${skills}
-${promptsHtml(C, step.prompts)}
+${promptsHtml(step.prompts)}
 ${done}
 ${pitfalls}
+${skills}
+${deeperHtml(step.deeper)}
 ${sourcesHtml(C, step.sources)}
-</div>
 </article>`;
 }
 
@@ -251,7 +271,7 @@ const BEND = 0.8;
 const STUB = 0.55;
 const TRUNK = 0.09;
 
-function mapModel(C) {
+export function mapModel(C) {
   const A = C.sharedStations.length;
   const anchors = C.sharedStations.map((sh) => ({ id: sh.id, label: sh.station, hrefs: {}, u: 0 }));
   const spans = [];
@@ -324,135 +344,112 @@ const startsHere = (C, mode) => `${C.lines[mode].name} starts here`;
 function hrefAttrs(hrefs) {
   const target = hrefs[MODES.find((m) => hrefs[m])];
   const data = MODES.filter((m) => hrefs[m]).map((m) => ` data-href-${m}="#${hrefs[m]}"`).join("");
-  return target ? { target, attrs: ` href="#${target}"${data} data-station="${target}"` } : null;
+  return target ? ` href="#${target}"${data} data-station="${target}"` : null;
 }
 
-function boardHtml(C, M) {
-  const S = 100, X0 = 80, R = 125, MID = 110 + R, H = MID + R + 230;
-  // The near row hangs its labels toward the viewer on leader lines, so they never cover the far row.
-  // Two drop depths are enough there; the far row's standing labels need three heights.
-  const LIFTS = [40, 88, 136];
-  const DROPS = [66, 180];
-  const W = Math.round(X0 * 2 + (M.uMax - M.uMin) * S);
-  const X = (u) => +(X0 + (u - M.uMin) * S).toFixed(1);
+// A flat schematic in the Beck and Vignelli tradition: two rows that merge at the interchanges.
+// Labels live in the SVG so they scale with the drawing. The stylesheet swaps to the column map
+// below a 960px viewport, where this viewBox would shrink the 16px labels under 13px.
+function schematicHtml(C, M) {
+  const S = 84, PAD = 44, R = 62, MID = 104;
+  const W = Math.round(PAD * 2 + (M.uMax - M.uMin) * S);
+  const H = MID * 2;
+  const X = (u) => +(PAD + (u - M.uMin) * S).toFixed(1);
   const at = (u, off) => `${X(u)} ${+(MID + off * R).toFixed(1)}`;
-  const paths = Object.fromEntries(MODES.map((m) => [m, trackPath(M, m, at)]));
-  const svg = [];
-  for (const m of MODES) svg.push(`<path class="track-bed" d="${paths[m]}"/>`);
-  for (const m of MODES) svg.push(`<path class="track" data-track="${m}" stroke="${esc(C.lines[m].color)}" d="${paths[m]}"/>`);
+  const out = [];
+  for (const m of MODES) out.push(`<path class="track" data-track="${m}" style="--c:${lineVar(m)}" d="${trackPath(M, m, at)}"/>`);
   for (const m of MODES) {
     const stub = M.lines[m].stub;
     if (stub === null) continue;
-    const y = MID + M.offset(m, "trunk") * R;
-    const dy = Math.sign(M.offset(m, "trunk"));
-    svg.push(`<path class="terminus" data-track="${m}" stroke="${esc(C.lines[m].color)}" d="M${X(stub)} ${y - 13} V${y + 13}"/>`);
-    svg.push(`<text class="board-note" data-track="${m}" fill="${esc(C.lines[m].color)}" x="${X(stub) + 6}" y="${y + dy * 52}" text-anchor="end">${esc(startsHere(C, m))}</text>`);
+    const y = +(MID + M.offset(m, "trunk") * R).toFixed(1);
+    out.push(`<g class="terminus" data-track="${m}" style="--c:${lineVar(m)}"><path d="M${X(stub)} ${y - 9} V${y + 9}"/><text x="${X(stub) - 10}" y="${y + 5}" text-anchor="end">${esc(startsHere(C, m))}</text></g>`);
   }
-  const pillars = [];
   for (const m of MODES) {
-    M.lines[m].stops.filter((s) => !s.shared).forEach((s, k) => {
-      const near = M.offset(m, "row") > 0;
-      const y = MID + M.offset(m, "row") * R;
-      const place = near ? `--drop:${DROPS[k % DROPS.length]}px` : `--lift:${LIFTS[k % LIFTS.length]}px`;
-      const style = `left:${X(s.u)}px;top:${y}px;${place};--c:${esc(C.lines[m].color)}`;
-      pillars.push(`<a class="pillar${near ? " below" : ""}" data-track="${m}" style="${style}" href="#${s.step.id}" data-station="${s.step.id}"><b></b><i></i><span>${esc(s.step.station)}</span></a>`);
-    });
-  }
-  M.anchors.forEach((a, j) => {
-    const link = hrefAttrs(a.hrefs);
-    const style = `left:${X(a.u)}px;top:${MID}px;--lift:${j % 2 ? 124 : 64}px`;
-    const inner = `<b></b><i></i><span>${esc(a.label)}</span>`;
-    pillars.push(link ? `<a class="pillar shared" style="${style}"${link.attrs}>${inner}</a>` : `<span class="pillar shared dead" style="${style}">${inner}</span>`);
-  });
-  const trains = MODES.map((m, i) => `<span class="train" data-track="${m}" style="--c:${esc(C.lines[m].color)};--dur:${(W / 105 + i * 1.3).toFixed(1)}s;--delay:${-i * 2.1}s;offset-path:path('${paths[m]}')"></span>`).join("");
-  return `<nav class="board-nav" aria-label="Line map">
-<div class="board-stage"><div class="board-fit"><div class="board" style="width:${W}px;height:${H}px">
-<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" aria-hidden="true">${svg.join("")}</svg>
-${pillars.join("")}${trains}
-</div></div></div>
-</nav>`;
-}
-
-function flatMapHtml(C, M) {
-  const SV = 48, Y0 = 34, XR = 16;
-  const H = Math.round(Y0 * 2 + (M.uMax - M.uMin) * SV);
-  const Y = (u) => +(Y0 + (u - M.uMin) * SV).toFixed(1);
-  const at = (u, off) => `${+(50 + off * XR).toFixed(2)} ${Y(u)}`;
-  const tracks = MODES.map((m) => `<path data-track="${m}" stroke="${esc(C.lines[m].color)}" d="${trackPath(M, m, at)}"/>`).join("");
-  const items = [];
-  for (const m of MODES) {
-    const side = M.offset(m, "row") < 0 ? "left" : "right";
+    const above = M.offset(m, "row") < 0;
+    const y = +(MID + M.offset(m, "row") * R).toFixed(1);
     for (const s of M.lines[m].stops.filter((x) => !x.shared)) {
-      items.push(`<a class="fm-stop ${side}" data-track="${m}" style="top:${Y(s.u)}px;--x:${50 + M.offset(m, "row") * XR}%;--c:${esc(C.lines[m].color)}" href="#${s.step.id}" data-station="${s.step.id}"><span class="fm-dot"></span><span class="fm-label">${esc(s.step.station)}</span></a>`);
-    }
-    const stub = M.lines[m].stub;
-    if (stub !== null) {
-      items.push(`<span class="fm-note ${side}" data-track="${m}" style="top:${Y(stub)}px;--x:${50 + M.offset(m, "trunk") * XR}%;--c:${esc(C.lines[m].color)}" aria-hidden="true"><span class="fm-term"></span><span class="fm-label">${esc(startsHere(C, m))}</span></span>`);
+      const ty = above ? y - 16 : y + 28;
+      out.push(`<a class="stop" data-track="${m}" style="--c:${lineVar(m)}" href="#${s.step.id}" data-station="${s.step.id}"><circle cx="${X(s.u)}" cy="${y}" r="7"/><text x="${X(s.u)}" y="${ty}" text-anchor="middle">${esc(s.step.station)}</text></a>`);
     }
   }
   for (const a of M.anchors) {
     const link = hrefAttrs(a.hrefs);
-    const inner = `<span class="fm-dot"></span><span class="fm-label">${esc(a.label)}</span>`;
-    const style = ` style="top:${Y(a.u)}px;--x:50%"`;
-    items.push(link ? `<a class="fm-stop shared"${style}${link.attrs}>${inner}</a>` : `<span class="fm-stop shared dead"${style}>${inner}</span>`);
+    const x = X(a.u);
+    const top = MID + M.offset(MODES[0], "trunk") * R;
+    const bot = MID + M.offset(MODES[1], "trunk") * R;
+    const inner = `<rect x="${x - 10}" y="${(top - 10).toFixed(1)}" width="20" height="${(bot - top + 20).toFixed(1)}" rx="10"/><text x="${x}" y="${(bot + 34).toFixed(1)}" text-anchor="middle">${esc(a.label)}</text>`;
+    out.push(link ? `<a class="stop interchange"${link}>${inner}</a>` : `<g class="stop interchange dead">${inner}</g>`);
   }
-  const legend = MODES.map((m) => `<span style="--c:${esc(C.lines[m].color)}"><span class="dot"></span>${esc(C.lines[m].name)}</span>`).join("");
-  return `<nav class="flatmap" aria-label="Line map">
-<p class="fm-legend">${legend}</p>
-<div class="fm" style="height:${H}px"><svg viewBox="0 0 100 ${H}" preserveAspectRatio="none" width="100%" height="${H}" aria-hidden="true">${tracks}</svg>${items.join("")}</div>
+  return `<svg class="schematic" viewBox="0 0 ${W} ${H}">${out.join("")}</svg>`;
+}
+
+// Below the tablet breakpoint the same model runs top to bottom with HTML labels.
+function columnMapHtml(C, M) {
+  const SV = 40, Y0 = 26, XR = 16;
+  const H = Math.round(Y0 * 2 + (M.uMax - M.uMin) * SV);
+  const Y = (u) => +(Y0 + (u - M.uMin) * SV).toFixed(1);
+  const at = (u, off) => `${+(50 + off * XR).toFixed(2)} ${Y(u)}`;
+  const tracks = MODES.map((m) => `<path data-track="${m}" style="--c:${lineVar(m)}" d="${trackPath(M, m, at)}"/>`).join("");
+  const items = [];
+  for (const m of MODES) {
+    const side = M.offset(m, "row") < 0 ? "left" : "right";
+    for (const s of M.lines[m].stops.filter((x) => !x.shared)) {
+      items.push(`<a class="cm-stop ${side}" data-track="${m}" style="top:${Y(s.u)}px;--x:${50 + M.offset(m, "row") * XR}%;--c:${lineVar(m)}" href="#${s.step.id}" data-station="${s.step.id}"><span class="cm-dot"></span><span class="cm-label">${esc(s.step.station)}</span></a>`);
+    }
+    const stub = M.lines[m].stub;
+    if (stub !== null) {
+      items.push(`<span class="cm-note ${side}" data-track="${m}" style="top:${Y(stub)}px;--x:${50 + M.offset(m, "trunk") * XR}%;--c:${lineVar(m)}"><span class="cm-term"></span><span class="cm-label">${esc(startsHere(C, m))}</span></span>`);
+    }
+  }
+  for (const a of M.anchors) {
+    const link = hrefAttrs(a.hrefs);
+    const inner = `<span class="cm-dot"></span><span class="cm-label">${esc(a.label)}</span>`;
+    const style = ` style="top:${Y(a.u)}px;--x:50%"`;
+    items.push(link ? `<a class="cm-stop interchange"${style}${link}>${inner}</a>` : `<span class="cm-stop interchange dead"${style}>${inner}</span>`);
+  }
+  return `<div class="column-map" style="height:${H}px"><svg viewBox="0 0 100 ${H}" preserveAspectRatio="none" width="100%" height="${H}" aria-hidden="true">${tracks}</svg>${items.join("")}</div>`;
+}
+
+function mapHtml(C, M) {
+  const legend = MODES.map((m) => `<li style="--c:${lineVar(m)}"><span class="swatch" aria-hidden="true"></span>${esc(C.lines[m].name)}</li>`).join("");
+  const shared = C.sharedStations.map((s) => s.station).join(", ");
+  return `<nav class="map" aria-label="Line map">
+<figure>
+${schematicHtml(C, M)}
+${columnMapHtml(C, M)}
+<figcaption id="map-cap"><ul class="legend">${legend}<li><span class="swatch interchange" aria-hidden="true"></span>Shared stations: ${esc(shared)}</li></ul><span class="map-hint">Select a station to jump to it.</span></figcaption>
+</figure>
 </nav>`;
 }
 
-function heroPrompt(C) {
-  for (const ch of C.chapters) if (ch.prompts.length) return ch.prompts[0];
-  for (const m of MODES) for (const s of C.lines[m].steps) if (s.prompts.length) return s.prompts[0];
-  return C.recipes[0] ? { intent: C.recipes[0].title, text: C.recipes[0].prompt } : { intent: "", text: "/poteto-mode" };
-}
-
 function heroHtml(C, M) {
-  const [lead, ...rest] = C.meta.tagline.split(/(?<=\.)\s+/);
-  const p = heroPrompt(C);
-  const pills = MODES.map((m) => {
+  const entries = MODES.map((m) => {
     const line = C.lines[m];
-    return `<a class="pill" href="#${m}" data-mode-link="${m}" style="--c:${esc(line.color)}"><span class="dot"></span><span><strong>${esc(line.name)}</strong><small>${inline(line.question)}</small></span></a>`;
+    const first = M.lines[m].stops[0].step.id;
+    return `<a class="entry" href="#${first}" style="--c:${lineVar(m)}"><span class="entry-name">${esc(line.name)}</span><span class="entry-q">${inline(line.question)}</span></a>`;
   }).join("");
   return `<section class="hero" aria-labelledby="hero-h">
-<div class="hero-copy">
-<p class="eyebrow">${esc(C.meta.title)}</p>
-<h1 id="hero-h">${esc(lead)}${rest.length ? ` <em>${esc(rest.join(" "))}</em>` : ""}</h1>
+<h1 id="hero-h">${esc(C.meta.tagline)}</h1>
 <p class="lede">${inline(C.meta.summary)}</p>
-<div class="pills">${pills}</div>
-<figure class="term" aria-label="Example prompt">
-<div class="term-bar" aria-hidden="true"><i></i><i></i><i></i><span>${inline(p.intent)}</span></div>
-<pre><code class="typed" data-copy-source>${promptHtml(p.text)}</code></pre>
-</figure>
-</div>
-<div class="hero-map">
-${boardHtml(C, M)}
-${flatMapHtml(C, M)}
-</div>
+<div class="entries">${entries}</div>
+${mapHtml(C, M)}
+<p class="agent-note">AI agents can read this page as <a href="playbook.md">playbook.md</a> or start at <a href="llms.txt">llms.txt</a>.</p>
 </section>`;
 }
 
 function agentsHtml(C) {
-  return `<section class="agents reveal" id="for-agents" aria-labelledby="for-agents-h">
-<div class="agents-icon">${ICON.bot}</div>
-<div class="agents-body">
+  return `<section class="agents" id="for-agents" aria-labelledby="for-agents-h">
 <h2 id="for-agents-h">For AI agents</h2>
 <div class="agents-brief" data-copy-source>${paras(C.agentBrief)}</div>
-<p class="agents-links"><a class="btn" href="playbook.md" type="text/markdown">Read playbook.md</a> <a class="btn ghost" href="llms.txt">llms.txt</a> ${copyButton("Copy brief")}</p>
-</div>
+<p class="actions"><a class="btn" href="playbook.md" type="text/markdown">Read playbook.md</a> <a class="btn" href="llms.txt">llms.txt</a> ${copyButton("Copy brief")}</p>
 </section>`;
 }
 
 function loopHtml(C, standalone) {
-  const n = C.loop.length;
-  const cards = C.loop
-    .map((c, i) => `<li class="loop-card" style="--i:${i}" data-loop="${i}"><span class="k">${pad2(i + 1)}</span><h3>${inline(c.title)}</h3><p>${inline(c.plain)}</p><span class="loop-bar"><i></i></span></li>`)
-    .join("");
-  const figure = `<figure class="loop" aria-labelledby="loop-cap" style="--n:${n}"><figcaption id="loop-cap">The core loop</figcaption><div class="loop-scene"><ol class="loop-stack">${cards}</ol></div><p class="loop-repeat">${ICON.repeat}<span>Then repeat</span></p></figure>`;
+  const steps = C.loop.map((c, i) => `<li><span class="loop-n" aria-hidden="true">${i + 1}</span><h3>${inline(c.title)}</h3><p>${inline(c.plain)}</p></li>`).join("");
+  const figure = `<figure class="loop" aria-labelledby="loop-cap"><figcaption id="loop-cap">The core loop</figcaption><ol class="loop-steps">${steps}</ol><p class="loop-repeat">${ICON.repeat}<span>Then repeat from step 1</span></p></figure>`;
   if (!standalone) return figure;
-  return `<section class="chapter loop-solo" id="loop" aria-label="The core loop">${figure}</section>`;
+  return `<section id="loop" aria-label="The core loop">${figure}</section>`;
 }
 
 // An install item is a command unless it ends like a sentence. Consecutive commands share one block.
@@ -471,96 +468,89 @@ function platformsHtml(C, asSection) {
   const panels = C.platforms
     .map(
       (p) => `<div class="pf-panel" data-pf-panel="${p.id}">
-<h3>${esc(p.name)}${p.verified ? "" : ' <span class="unverified">unverified: check your tool\'s docs</span>'}</h3>
-<div class="install"><p class="mini-label">Install</p>${installParts(p.install).map((part) => (part.command ? `<figure class="prompt"><figcaption><span class="prompt-intent">Run</span>${copyButton()}</figcaption><pre><code data-copy-source>${part.lines.map(esc).join("\n")}</code></pre></figure>` : paras(part.lines))).join("")}</div>
-<dl class="pf-facts"><div><dt>Run a skill</dt><dd>${inline(p.invoke)}</dd></div><div><dt>Parallel work</dt><dd>${inline(p.parallel)}</dd></div><div><dt>Scheduled runs</dt><dd>${inline(p.schedule)}</dd></div></dl>
-<p class="pf-docs"><a href="${esc(p.docs)}">${esc(p.name)} docs</a></p>
+<h3>${esc(p.name)}${p.verified ? "" : ' <span class="unverified">Unverified. Check your tool\'s docs.</span>'}</h3>
+${installParts(p.install).map((part) => (part.command ? promptBlock("", part.lines.map(esc).join("\n"), "Run in a terminal") : paras(part.lines))).join("\n")}
+<dl class="facts"><div><dt>Run a skill</dt><dd>${inline(p.invoke)}</dd></div><div><dt>Parallel work</dt><dd>${inline(p.parallel)}</dd></div><div><dt>Scheduled runs</dt><dd>${inline(p.schedule)}</dd></div></dl>
+<p><a href="${esc(p.docs)}">${esc(p.name)} docs</a></p>
 </div>`,
     )
     .join("\n");
-  const body = (attrs) => `<div class="platforms"${attrs}><div class="seg" role="group" aria-label="Platform">${buttons}</div>${panels}</div>`;
+  const body = (attrs) => `<div class="platforms"${attrs}><p class="seg-label" id="pf-seg-label">Your agent tool</p><div class="seg" role="group" aria-labelledby="pf-seg-label">${buttons}</div>${panels}</div>`;
   if (!asSection) return body(' id="platforms"');
-  return `<section class="chapter reveal" id="platforms" aria-labelledby="platforms-h"><p class="kicker">Setup</p><h2 id="platforms-h">Install on your tool</h2>${body("")}</section>`;
+  return `<section id="platforms" aria-labelledby="platforms-h"><h2 id="platforms-h">Install on your tool</h2>${body("")}</section>`;
 }
 
 function chapterHtml(C, ch) {
-  const story = ch.id === "what" && C.loop.length;
-  const text = `<div class="chapter-text">
-<p class="kicker">${inline(ch.kicker)}</p>
+  const loop = ch.id === "what" && C.loop.length ? loopHtml(C, false) : "";
+  return `<section class="chapter" id="${ch.id}" aria-labelledby="${ch.id}-h">
 <h2 id="${ch.id}-h">${inline(ch.title)}</h2>
-${paras(ch.plain, story ? "story-p" : "")}
-${deeperHtml(ch.deeper)}
-${promptsHtml(C, ch.prompts)}
+${paras(ch.plain)}
+${loop}
+${promptsHtml(ch.prompts)}
 ${ch.id === "setup" ? platformsHtml(C, false) : ""}
+${deeperHtml(ch.deeper)}
 ${sourcesHtml(C, ch.sources)}
-</div>`;
-  if (story) return `<section class="chapter story" id="${ch.id}" aria-labelledby="${ch.id}-h">${text}<div class="story-pin">${loopHtml(C, false)}</div></section>`;
-  return `<section class="chapter reveal" id="${ch.id}" aria-labelledby="${ch.id}-h">${text}</section>`;
+</section>`;
 }
 
 function linesHtml(C, M) {
   const buttons = MODES.map(
-    (m) => `<button type="button" data-mode-btn="${m}" aria-pressed="${m === "greenfield"}" style="--c:${esc(C.lines[m].color)}"><span class="dot"></span>${esc(C.lines[m].name)}<small>${C.lines[m].steps.length} stations</small></button>`,
+    (m) => `<button type="button" data-mode-btn="${m}" aria-pressed="${m === MODES[0]}" style="--c:${lineVar(m)}"><span class="swatch" aria-hidden="true"></span>${esc(C.lines[m].name)}</button>`,
   ).join("");
+  const first = C.platforms[0];
   const lines = MODES.map((m) => {
     const line = C.lines[m];
-    return `<div class="line" id="${m}" data-line="${m}" style="--c:${esc(line.color)}" aria-labelledby="${m}-h">
-<header class="line-head"><h2 id="${m}-h">${esc(line.name)} line</h2><p>${inline(line.question)}</p></header>
-<div class="line-steps">
-${M.lines[m].stops.map((s) => stepHtml(C, s, line.steps.length)).join("\n")}
-</div>
+    return `<div class="line" id="${m}" data-line="${m}" style="--c:${lineVar(m)}" aria-labelledby="${m}-h">
+<header class="line-head"><h2 id="${m}-h">${esc(line.name)} line</h2><p>${inline(line.question)} ${line.steps.length} stations.</p></header>
+<ol class="stations">
+${M.lines[m].stops.map((s) => `<li>${stepHtml(C, s, line.steps.length)}</li>`).join("\n")}
+</ol>
 </div>`;
   }).join("\n");
   return `<section class="lines" id="lines" aria-label="The two lines">
-<div class="mode-bar"><div class="seg mode-seg" role="group" aria-label="Choose a line">${buttons}</div></div>
+<div class="line-switch"><p class="seg-label" id="line-seg-label">Showing</p><div class="seg" role="group" aria-labelledby="line-seg-label">${buttons}</div></div>
+<p class="invoke-note"><span class="meta-label">On <span data-pf-name>${esc(first.name)}</span></span> <span data-pf-invoke>${inline(first.invoke)}</span></p>
 ${lines}
 </section>`;
 }
 
 function skillsHtml(C) {
-  const cards = C.skills
-    .map(
-      (s) => `<li class="skill-card"><a href="${esc(skillUrl(C, s.id))}"><code>/${esc(s.id)}</code></a><p>${inline(s.oneLine)}</p><p class="skill-when"><span class="mini-label">When</span> ${inline(s.trigger)}</p>${s.needsRunningApp ? '<span class="badge">Needs a running app</span>' : ""}</li>`,
-    )
+  const items = C.skills
+    .map((s) => `<div><dt><a href="${esc(skillUrl(C, s.id))}"><code>/${esc(s.id)}</code></a>${s.needsRunningApp ? ' <span class="note">Needs a running app</span>' : ""}</dt><dd><p>${inline(s.oneLine)}</p><p class="when"><span class="meta-label">When</span> ${inline(s.trigger)}</p></dd></div>`)
     .join("");
-  return `<section class="wide reveal" id="skills" aria-labelledby="skills-h"><p class="kicker">Reference</p><h2 id="skills-h">The skills</h2><ul class="skill-grid">${cards}</ul></section>`;
+  return `<section class="ref" id="skills" aria-labelledby="skills-h"><h2 id="skills-h">The skills</h2><dl class="ref-list">${items}</dl></section>`;
 }
 
 function principlesHtml(C) {
-  const cards = C.principles
-    .map(
-      (p, i) => `<li><button type="button" class="flip" aria-pressed="false"><span class="flip-inner"><span class="face front"><span class="k">${pad2(i + 1)}</span><strong>${esc(p.name)}</strong><span class="when">${inline(p.when)}</span><span class="hint" aria-hidden="true">Flip</span></span><span class="face back"><span class="k">${esc(p.name)}</span><span class="one">${inline(p.oneLine)}</span></span></span></button><a class="deck-src" href="${esc(skillUrl(C, p.id))}">${esc(p.id)}</a></li>`,
-    )
+  const items = C.principles
+    .map((p) => `<div><dt><a href="${esc(skillUrl(C, p.id))}">${esc(p.name)}</a></dt><dd><p>${inline(p.oneLine)}</p><p class="when">${inline(p.when)}</p></dd></div>`)
     .join("");
-  return `<section class="wide reveal" id="principles" aria-labelledby="principles-h"><p class="kicker">Reference</p><h2 id="principles-h">The principles</h2><p class="section-lede">Select a card to flip it.</p><ul class="deck">${cards}</ul></section>`;
+  return `<section class="ref" id="principles" aria-labelledby="principles-h"><h2 id="principles-h">The principles</h2><dl class="ref-list cols">${items}</dl></section>`;
 }
 
 function recipesHtml(C) {
   const chips = ["all", ...MODES].map((m, i) => `<button type="button" data-recipe-mode="${m}" aria-pressed="${i === 0}">${m === "all" ? "All" : esc(C.lines[m].name)}</button>`).join("");
   const items = C.recipes
     .map((r) => {
-      const tag = r.mode === "any" ? "Any line" : `${C.lines[r.mode].name}`;
-      const color = r.mode === "any" ? "" : ` style="--c:${esc(C.lines[r.mode].color)}"`;
-      return `<li class="recipe" id="recipe-${r.id}" data-mode="${r.mode}"><div class="recipe-head"><h3>${inline(r.title)}</h3><span class="tag"${color}>${tag}</span></div>
-<figure class="prompt"><figcaption><span class="prompt-intent">Prompt</span>${copyButton()}</figcaption><pre><code data-copy-source>${promptHtml(r.prompt)}</code></pre></figure>
-<p class="recipe-why">${inline(r.why)}</p>${sourcesHtml(C, r.sources)}</li>`;
+      const tag = r.mode === "any" ? `<span class="tag">Any line</span>` : `<span class="tag" style="--c:${lineVar(r.mode)}"><span class="swatch" aria-hidden="true"></span>${esc(C.lines[r.mode].name)}</span>`;
+      return `<li class="recipe" id="recipe-${r.id}" data-mode="${r.mode}"><h3>${inline(r.title)}</h3>${tag}
+${promptBlock("", promptHtml(r.prompt))}
+<p>${inline(r.why)}</p>${sourcesHtml(C, r.sources)}</li>`;
     })
     .join("\n");
-  return `<section class="wide reveal" id="recipes" aria-labelledby="recipes-h"><p class="kicker">Copy and go</p><h2 id="recipes-h">Recipes</h2>
-<div class="recipe-tools"><label class="search"><span class="visually-hidden">Filter recipes</span><svg aria-hidden="true" viewBox="0 0 16 16" width="15" height="15"><circle cx="7" cy="7" r="5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M11 11l3.5 3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg><input type="search" id="recipe-q" placeholder="Filter recipes" autocomplete="off"></label><div class="seg" role="group" aria-label="Filter by line">${chips}</div><p class="recipe-count" id="recipe-count" aria-live="polite">${C.recipes.length} recipes</p></div>
+  return `<section class="ref" id="recipes" aria-labelledby="recipes-h"><h2 id="recipes-h">Recipes</h2>
+<div class="recipe-tools"><label class="filter"><span>Filter</span><input type="search" id="recipe-q" placeholder="For example: migration" autocomplete="off"></label><div class="seg" role="group" aria-label="Filter by line">${chips}</div><p class="recipe-count" id="recipe-count" aria-live="polite">${C.recipes.length} recipes</p></div>
 <ul class="recipe-list">${items}</ul><p class="recipe-empty" id="recipe-empty" hidden>No recipe matches. Try fewer words.</p></section>`;
 }
 
 function pitfallsHtml(C) {
-  const items = C.pitfalls
-    .map((p) => `<li class="pair"><div class="dont"><span class="tag">Don't</span><p>${inline(p.dont)}</p></div><div class="do"><span class="tag">Do</span><p>${inline(p.do)}</p></div>${sourcesHtml(C, p.sources)}</li>`)
-    .join("");
-  return `<section class="wide reveal" id="pitfalls" aria-labelledby="pitfalls-h"><p class="kicker">Avoid these</p><h2 id="pitfalls-h">Pitfalls</h2><ul class="pairs">${items}</ul></section>`;
+  const rows = C.pitfalls.map((p) => `<tr><td data-label="Don't">${inline(p.dont)}</td><td data-label="Do">${inline(p.do)}${sourcesHtml(C, p.sources)}</td></tr>`).join("");
+  return `<section class="ref" id="pitfalls" aria-labelledby="pitfalls-h"><h2 id="pitfalls-h">Pitfalls</h2><table class="pitfalls"><thead><tr><th scope="col">Don't</th><th scope="col">Do</th></tr></thead><tbody>${rows}</tbody></table></section>`;
 }
 
 function glossaryHtml(C) {
   const items = C.glossary.map((g) => `<div><dt>${inline(g.term)}</dt><dd>${inline(g.plain)}</dd></div>`).join("");
-  return `<section class="reveal" id="glossary" aria-labelledby="glossary-h"><p class="kicker">Words</p><h2 id="glossary-h">Glossary</h2><dl class="glossary">${items}</dl></section>`;
+  return `<section class="ref" id="glossary" aria-labelledby="glossary-h"><h2 id="glossary-h">Glossary</h2><dl class="glossary">${items}</dl></section>`;
 }
 
 function routingHtml(C, R) {
@@ -568,31 +558,58 @@ function routingHtml(C, R) {
   const body = R.rows
     .map((row) => {
       const base = row.cells[0].join(",");
-      const cells = row.cells.map((names, i) => `<td${i && names.join(",") !== base ? ' class="differs"' : ""}>${names.map((n) => `<span class="droid"><code>${esc(n)}</code><small>${esc(droidLabel(n))}</small></span>`).join("")}</td>`);
+      const cells = row.cells.map((names, i) => `<td${i && names.join(",") !== base ? ' class="differs"' : ""}>${names.map((n) => `<span class="droid"><code>${esc(n)}</code> <span>${esc(droidLabel(n))}</span></span>`).join("")}</td>`);
       return `<tr><th scope="row">${esc(row.role)}</th>${cells.join("")}</tr>`;
     })
     .join("");
-  return `<section class="wide blueprint routing reveal" id="routing" aria-labelledby="routing-h"><p class="kicker">Under the hood</p><h2 id="routing-h">Model routing</h2>
+  return `<section class="ref" id="routing" aria-labelledby="routing-h"><h2 id="routing-h">Model routing</h2>
 ${paras(C.routing.plain)}
-<div class="table-wrap" tabindex="0" role="region" aria-label="Model routing table"><table><thead>${head}</thead><tbody>${body}</tbody></table></div>
-<p class="table-note">Highlighted cells differ from the ${esc(cap(R.modes[0]))} column.</p>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Model routing table"><table class="routing"><thead>${head}</thead><tbody>${body}</tbody></table></div>
+<p class="table-note">Marked cells differ from the ${esc(cap(R.modes[0]))} column.</p>
 ${deeperHtml(C.routing.deeper)}
 </section>`;
 }
 
-function minimapHtml(C, M) {
-  const entries = [];
-  const hasSetup = C.chapters.some((ch) => ch.id === "setup");
-  for (const ch of C.chapters) {
-    entries.push({ id: ch.id, label: ch.title });
-    if (ch.id === "pick") for (const m of MODES) for (const s of M.lines[m].stops) entries.push({ id: s.step.id, label: s.step.station, mode: m, color: C.lines[m].color, shared: s.shared });
-  }
-  if (!hasSetup) entries.push({ id: "platforms", label: "Install" });
-  for (const [id, label] of [["skills", "Skills"], ["principles", "Principles"], ["recipes", "Recipes"], ["pitfalls", "Pitfalls"], ["glossary", "Glossary"], ["routing", "Model routing"]]) entries.push({ id, label });
-  const items = entries
-    .map((e) => `<li${e.mode ? ` data-mode="${e.mode}" class="mm-station${e.shared ? " mm-shared" : ""}" style="--c:${esc(e.color)}"` : ""}><a href="#${e.id}" data-mm="${e.id}"><span class="mm-dot"></span><span class="mm-label">${inline(e.label)}</span></a></li>`)
+function tocModel(C, M) {
+  const pick = C.chapters.findIndex((ch) => ch.id === "pick");
+  const chapter = (ch) => ({ id: ch.id, label: ch.title });
+  const start = C.chapters.slice(0, pick + 1).map(chapter);
+  if (!C.chapters.some((ch) => ch.id === "setup")) start.push({ id: "platforms", label: "Install on your tool" });
+  if (!(C.chapters.some((ch) => ch.id === "what") && C.loop.length)) start.unshift({ id: "loop", label: "The core loop" });
+  return [
+    { label: "Start", items: start },
+    ...MODES.map((m) => ({
+      label: `${C.lines[m].name} line`,
+      id: m,
+      mode: m,
+      items: M.lines[m].stops.map((s) => ({ id: s.step.id, label: s.step.station, n: s.n, shared: !!s.shared })),
+    })),
+    { label: "Going further", items: C.chapters.slice(pick + 1).map(chapter) },
+    {
+      label: "Reference",
+      items: [["skills", "The skills"], ["principles", "The principles"], ["recipes", "Recipes"], ["pitfalls", "Pitfalls"], ["glossary", "Glossary"], ["routing", "Model routing"], ["for-agents", "For AI agents"]].map(([id, label]) => ({ id, label })),
+    },
+  ];
+}
+
+function tocHtml(C, M) {
+  const groups = tocModel(C, M)
+    .map((g) => {
+      const head = g.id ? `<a class="toc-group" href="#${g.id}" data-toc="${g.id}" style="--c:${lineVar(g.mode)}"><span class="swatch" aria-hidden="true"></span>${esc(g.label)}</a>` : `<p class="toc-group">${esc(g.label)}</p>`;
+      const items = g.items
+        .map((it) => (g.mode
+          ? `<li><a href="#${it.id}" data-toc="${it.id}" data-station="${it.id}"${it.shared ? ' class="is-shared"' : ""}><span class="toc-n" aria-hidden="true">${it.n}</span>${inline(it.label)}</a></li>`
+          : `<li><a href="#${it.id}" data-toc="${it.id}">${inline(it.label)}</a></li>`))
+        .join("");
+      return `<li${g.mode ? ` class="toc-line" data-mode="${g.mode}" style="--c:${lineVar(g.mode)}"` : ""}>${head}<ol>${items}</ol></li>`;
+    })
     .join("");
-  return `<nav class="minimap" aria-label="Progress"><ol>${items}</ol></nav>`;
+  return `<nav class="toc" id="toc" aria-label="Contents"><ol>${groups}</ol></nav>`;
+}
+
+function toolsHtml(C, where) {
+  const select = `<label class="pf-pick"><span>Using</span><select data-pf-select aria-label="Your agent tool">${C.platforms.map((p) => `<option value="${p.id}">${esc(p.name)}</option>`).join("")}</select></label>`;
+  return `<div class="tools tools-${where}">${select}<button type="button" class="icon-btn" data-theme-toggle aria-pressed="false" aria-label="Dark theme">${ICON.theme}</button></div>`;
 }
 
 function templatesHtml(C) {
@@ -605,7 +622,6 @@ function guardInline(text, tag) {
 }
 
 export function renderHtml(C, R, assets) {
-  const pf = C.platforms;
   const M = mapModel(C);
   const hasSetup = C.chapters.some((ch) => ch.id === "setup");
   const hasStory = C.chapters.some((ch) => ch.id === "what") && C.loop.length;
@@ -621,7 +637,7 @@ export function renderHtml(C, R, assets) {
   };
   const json = JSON.stringify(data).replace(/</g, "\\u003c");
   return `<!doctype html>
-<html lang="en" style="--gf:${esc(C.lines.greenfield.color)};--bf:${esc(C.lines.brownfield.color)}">
+<html lang="en" style="${lineVars(C)}">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -638,19 +654,20 @@ ${guardInline(assets.css, "style")}
 <body>
 <a class="skip" href="#main">Skip to content</a>
 <header class="topbar" id="top">
-<div class="topbar-row">
-<a class="brand" href="#main"><span class="brand-mark" aria-hidden="true"><i></i><i></i></span>${esc(C.meta.title)}</a>
-<div class="topbar-tools">
-<label class="pf-select"><span>On</span><select id="pf-select" aria-label="Your agent tool">${pf.map((p) => `<option value="${p.id}">${esc(p.name)}</option>`).join("")}</select></label>
-<button type="button" class="icon-btn" id="theme-toggle" aria-pressed="false" aria-label="Dark theme">${ICON.theme}</button>
-</div>
-</div>
-${minimapHtml(C, M)}
+<a class="brand" href="#main">${esc(C.meta.title)}</a>
+<button type="button" class="contents-btn" aria-expanded="false" aria-controls="sidebar">${ICON.menu}<span>Contents</span></button>
+${toolsHtml(C, "top")}
 </header>
-<main id="main">
+<div class="layout">
+<aside class="sidebar" id="sidebar" aria-label="Sidebar">
+<div class="sidebar-head"><a class="brand" href="#main">${esc(C.meta.title)}</a><button type="button" class="icon-btn drawer-close" aria-label="Close contents">${ICON.close}</button></div>
+${toolsHtml(C, "side")}
+${tocHtml(C, M)}
+</aside>
+<div class="scrim" hidden></div>
+<div class="page">
+<main id="main" tabindex="-1">
 ${heroHtml(C, M)}
-<div class="content">
-${agentsHtml(C)}
 ${hasStory ? "" : loopHtml(C, true)}
 ${body.join("\n")}
 ${hasSetup ? "" : platformsHtml(C, true)}
@@ -660,13 +677,14 @@ ${recipesHtml(C)}
 ${pitfallsHtml(C)}
 ${glossaryHtml(C)}
 ${routingHtml(C, R)}
-</div>
+${agentsHtml(C)}
 </main>
 <footer class="foot">
 <p><a href="${esc(C.meta.repo)}">PV Stack on GitHub</a>. Based on ${C.meta.sources.map((s) => `<a href="${esc(s.url)}">${esc(s.title)}</a>`).join(" and ")} by Lauren Tan (poteto).</p>
-<p>Agents can read this page as <a href="playbook.md">markdown</a> or start at <a href="llms.txt">llms.txt</a>.</p>
 </footer>
-<div class="toast" id="toast" role="status" aria-live="polite"></div>
+</div>
+</div>
+<p class="visually-hidden" id="status" role="status" aria-live="polite"></p>
 ${templatesHtml(C)}
 <script type="application/json" id="playbook-data">${json}</script>
 <script>
