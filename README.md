@@ -7,6 +7,10 @@ pstack is a set of rigorous engineering workflows. You start a task with `/potet
 1. **It runs on Droid.** One mapping file translates Cursor's tools and Task parameters to Droid's.
 2. **It routes each role to the model that VulcanBench shows is the best value for that kind of work.** You can choose from two modes.
 
+## Playbook
+
+New to pstack? [The PV Stack Playbook](playbook/index.html) walks you through it, with one path for a new project (greenfield) and one for an existing codebase (brownfield). It works with any agent that can load skills. Agents can read [playbook/llms.txt](playbook/llms.txt) and [playbook/playbook.md](playbook/playbook.md) to guide you through it. To change it, edit `playbook/src/content.mjs` and run `npm run playbook`.
+
 ## Modes
 
 | Role | Balanced (default) | Budget |
