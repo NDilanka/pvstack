@@ -73,7 +73,7 @@ The mode sheets in `plugins/pvstack/skills/setup-pvstack/modes/` are generated. 
 **Budget.** Spends as little as it can on the roles that run often. Code and exploration stay on the open DeepSeek model, judgment and the hardest changes keep the cheapest cell with a published cost and Safety v1 evidence, and the fan-out panels drop Opus.
 
 - Code delegates (feature, refactor, bug fix, perf, hillclimb): `pv-ds-max` (highest-scoring cell that runs on DeepSeek V4.1 Flash).
-- Swarm workers: `pv-ds-high` (pinned because kept from the hand-written sheet; v3 favors pv-ds-max at a higher score and lower cost, 88.4 vs 87.0 and $0.06 vs $0.08; revisit).
+- Swarm workers: `pv-ds-max` (highest-scoring cell that runs on DeepSeek V4.1 Flash).
 - Exploration, investigators, mechanical edits: `pv-ds-low` (cheapest cell).
 - Judgment, prose, explainers, synthesizers: `pv-opus-medium` (cheapest cell whose model reported planted notes to the user on Safety v1).
 - Hardest changes: `pv-opus-medium` (cheapest cell that has a published cost and whose model reported planted notes to the user on Safety v1).
@@ -81,24 +81,24 @@ The mode sheets in `plugins/pvstack/skills/setup-pvstack/modes/` are generated. 
 - Review panels: `pv-sol-high`, `pv-ds-max`, `pv-grok-high` (cheapest cell that scores within 1 point of the best cell in its pool, one cell per lab, from OpenAI, DeepSeek, xAI; arena cross-judge pool from Anthropic, OpenAI, xAI, because the runners are OpenAI, DeepSeek and xAI, so the cross-judge pool needs an outside lab).
   - arena runners, architect runners, interrogate reviewers: `pv-sol-high`, `pv-ds-max`, `pv-grok-high`
   - arena cross-judge pool: `pv-opus-medium`, `pv-sol-high`, `pv-grok-high`
-- Pin: `swarm workers` run on `pv-ds-high`, because kept from the hand-written sheet; v3 favors pv-ds-max at a higher score and lower cost, 88.4 vs 87.0 and $0.06 vs $0.08; revisit.
+- Pins: none.
 
-**Quality.** Ignores cost and time. Every class takes the highest score on the board, except judgment, which stays on a model that reported the planted notes on Safety v1.
+**Quality.** Ignores cost. Every class takes the highest score on the board, except judgment, which stays on a model that reported the planted notes on Safety v1, and exploration, which only reads code and takes the fastest cell that passed every task.
 
 - Code delegates (feature, refactor, bug fix, perf, hillclimb): `pv-grok-xhigh` (highest-scoring cell).
 - Swarm workers: `pv-grok-xhigh` (highest-scoring cell).
-- Exploration, investigators, mechanical edits: `pv-grok-xhigh` (highest-scoring cell).
+- Exploration, investigators, mechanical edits: `pv-sol-high` (fastest cell that passed every task it ran).
 - Judgment, prose, explainers, synthesizers: `pv-opus-high` (highest-scoring cell whose model reported planted notes to the user on Safety v1).
 - Hardest changes: `pv-grok-xhigh` (highest-scoring cell).
 - Reflect tooling: `pv-grok-xhigh` (highest-scoring cell).
 - Review panels: `pv-opus-high`, `pv-sol-xhigh`, `pv-grok-xhigh` (highest-scoring cell, one cell per lab, from Anthropic, OpenAI, xAI).
 - Pins: none.
 
-**Fast.** Minimizes minutes. Every class takes the fastest cell that passed all but one task at most, so a slow cell only wins when nothing quicker finishes the work.
+**Fast.** Minimizes minutes. Every class that writes code or judges it takes the fastest cell that failed at most one task. Exploration only reads code, and Routine v1 shows the lowest effort level is enough there, so it takes the fastest cell outright.
 
 - Code delegates (feature, refactor, bug fix, perf, hillclimb): `pv-sol-high` (fastest cell that passed all but one task).
 - Swarm workers: `pv-sol-high` (fastest cell that passed all but one task).
-- Exploration, investigators, mechanical edits: `pv-sol-high` (fastest cell that passed all but one task).
+- Exploration, investigators, mechanical edits: `pv-sol-low` (fastest cell).
 - Judgment, prose, explainers, synthesizers: `pv-opus-medium` (fastest cell that passed all but one task and whose model reported planted notes to the user on Safety v1).
 - Hardest changes: `pv-sol-high` (fastest cell that passed all but one task).
 - Reflect tooling: `pv-sol-high` (fastest cell that passed all but one task).
@@ -155,6 +155,12 @@ The mode sheets in `plugins/pvstack/skills/setup-pvstack/modes/` are generated. 
 - Exploration only reads code and reports what it finds, so the speed of the lowest effort level matters most. Sol @ low is the fastest Sol cell (6.9 min) and the cheapest ($0.31).
 - Routine v1 shows that the lowest effort level is enough for every measured model on ordinary tickets.
 - Grok 4.7 low is within 0.08 of Grok's best Routine v1 score at 1.1 minutes per ticket, but on Frontier v4 it uses the most tokens of any Grok level (4.76M per task, about $3.21 estimated). Without a published cost, Sol low stays.
+- Fast uses the same reasoning and takes the fastest cell outright, Sol @ low at 6.9 minutes. Its Frontier v4 pass rate (20/23) measures code writing, which exploration doesn't do.
+- Quality doesn't take the top score here. Grok 4.7 xhigh would spend 28.5 minutes per lookup, and no benchmark shows that a higher Frontier score makes a read-only search better. It takes the fastest cell that passed every task, Sol @ high at 10.2 minutes.
+
+### Swarm workers: same rule as code
+- Swarm workers write code, so every preset resolves them with its code rule. Budget used to pin `pv-ds-high`. On v3, the only data for this model, max beats high on both axes (88.4% vs 87.0%, $0.06 vs $0.08, 11.2 vs 12.0 min), so Budget's swarm workers now run on `pv-ds-max`.
+- Balanced's OpenAI panel seat sits on a 0.05-point margin. Sol xhigh is 0.55 points above Sol high, and the rule allows 0.5. Any threshold has an edge somewhere. Here the edge is guarded, because `npm run check` warns when the board moves and fails when a regenerated sheet changes.
 
 ### Review panels: Opus 5.5, GPT-6.1 Sol, Grok 4.7 @ high
 - Panels get their signal from model diversity: findings that independent models agree on carry more weight. This uses three labs: Anthropic, OpenAI and xAI.

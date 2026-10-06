@@ -6,12 +6,12 @@ feature, refactoring: pv-sol-high
 bug-fix: pv-sol-high
 perf-issue: pv-sol-high
 hillclimb: pv-sol-high
-mechanical edits: pv-sol-high
+mechanical edits: pv-sol-low
 judgment and prose: pv-opus-medium
 hardest tasks: pv-sol-high
-how explorer: pv-sol-high
+how explorer: pv-sol-low
 how explainer: pv-opus-medium
-why investigators: pv-sol-high
+why investigators: pv-sol-low
 why synthesizer: pv-opus-medium
 reflect tooling: pv-sol-high
 reflect judgment, divergent, synthesizer: pv-opus-medium

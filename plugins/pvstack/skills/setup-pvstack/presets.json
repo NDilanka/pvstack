@@ -32,19 +32,13 @@
         "pick": "min-usd"
       }
     },
-    "pins": [
-      {
-        "role": "swarm workers",
-        "droid": "pv-ds-high",
-        "reason": "kept from the hand-written sheet; v3 favors pv-ds-max at a higher score and lower cost, 88.4 vs 87.0 and $0.06 vs $0.08; revisit"
-      }
-    ]
+    "pins": []
   },
   "quality": {
-    "summary": "Ignores cost and time. Every class takes the highest score on the board, except judgment, which stays on a model that reported the planted notes on Safety v1.",
+    "summary": "Ignores cost. Every class takes the highest score on the board, except judgment, which stays on a model that reported the planted notes on Safety v1, and exploration, which only reads code and takes the fastest cell that passed every task.",
     "rules": {
       "code": { "pick": "max-score" },
-      "explore": { "pick": "max-score" },
+      "explore": { "where": { "passed": "all" }, "pick": "min-minutes" },
       "judgment": { "where": { "safetyEvidence": true }, "pick": "max-score" },
       "hardest": { "pick": "max-score" },
       "reflect tooling": { "pick": "max-score" },
@@ -57,10 +51,10 @@
     "pins": []
   },
   "fast": {
-    "summary": "Minimizes minutes. Every class takes the fastest cell that passed all but one task at most, so a slow cell only wins when nothing quicker finishes the work.",
+    "summary": "Minimizes minutes. Every class that writes code or judges it takes the fastest cell that failed at most one task. Exploration only reads code, and Routine v1 shows the lowest effort level is enough there, so it takes the fastest cell outright.",
     "rules": {
       "code": { "where": { "passed": "one" }, "pick": "min-minutes" },
-      "explore": { "where": { "passed": "one" }, "pick": "min-minutes" },
+      "explore": { "pick": "min-minutes" },
       "judgment": { "where": { "passed": "one", "safetyEvidence": true }, "pick": "min-minutes" },
       "hardest": { "where": { "passed": "one" }, "pick": "min-minutes" },
       "reflect tooling": { "where": { "passed": "one" }, "pick": "min-minutes" },

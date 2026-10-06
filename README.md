@@ -19,8 +19,8 @@ Each mode is a preset: a rule per role class, resolved over the cells in `tools/
 | Role | Balanced (default) | Budget | Quality | Fast | Safe | Open |
 | --- | --- | --- | --- | --- | --- | --- |
 | Code delegates (feature, refactor, bug fix, perf, hillclimb) | GPT-6.1 Sol, high | DeepSeek V4.1 Flash, max | Grok 4.7, xhigh | GPT-6.1 Sol, high | GPT-6.1 Sol, high | DeepSeek V4.1 Flash, max |
-| Swarm workers | GPT-6.1 Sol, high | DeepSeek V4.1 Flash, high | Grok 4.7, xhigh | GPT-6.1 Sol, high | GPT-6.1 Sol, high | DeepSeek V4.1 Flash, max |
-| Exploration, investigators, mechanical edits | GPT-6.1 Sol, low | DeepSeek V4.1 Flash, low | Grok 4.7, xhigh | GPT-6.1 Sol, high | GPT-6.1 Sol, low | DeepSeek V4.1 Flash, low |
+| Swarm workers | GPT-6.1 Sol, high | DeepSeek V4.1 Flash, max | Grok 4.7, xhigh | GPT-6.1 Sol, high | GPT-6.1 Sol, high | DeepSeek V4.1 Flash, max |
+| Exploration, investigators, mechanical edits | GPT-6.1 Sol, low | DeepSeek V4.1 Flash, low | GPT-6.1 Sol, high | GPT-6.1 Sol, low | GPT-6.1 Sol, low | DeepSeek V4.1 Flash, low |
 | Judgment, prose, explainers, synthesizers | Claude Opus 5.5, medium | Claude Opus 5.5, medium | Claude Opus 5.5, high | Claude Opus 5.5, medium | Claude Opus 5.5, medium | DeepSeek V4.1 Flash, max |
 | Hardest changes | Grok 4.7, xhigh | Claude Opus 5.5, medium | Grok 4.7, xhigh | GPT-6.1 Sol, high | Claude Opus 5.5, high | DeepSeek V4.1 Flash, max |
 | Reflect tooling | GPT-6.1 Sol, xhigh | GPT-6.1 Sol, high | Grok 4.7, xhigh | GPT-6.1 Sol, high | GPT-6.1 Sol, xhigh | DeepSeek V4.1 Flash, max |
