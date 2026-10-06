@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Resolves a PV Stack preset into a role sheet. This file ships inside the
+// Resolves a pvstack preset into a role sheet. This file ships inside the
 // plugin and is also imported by tools/presets.mjs, so the generated sheets and
 // a user's CLI run the same code.
 //
@@ -135,13 +135,24 @@ const FILTERS = {
     test: (c, v, best) => c.score >= best - v,
     text: (v) => `that scores within ${v} point${v === 1 ? "" : "s"} of the best cell in its pool`,
   },
+  // Strictly more resolved, so a tie in the Droid run never overrides a Frontier v4 gap.
+  droidDominated: {
+    test: (c, v, best, pool) => {
+      const beaten = c.droid != null && pool.some((o) => o.model === c.model && o.droid != null && o.droid.resolvedRate > c.droid.resolvedRate && o.droid.credits < c.droid.credits);
+      return beaten === v;
+    },
+    text: () => "that no cell of the same model beats in the Droid run with more tasks resolved on fewer credits",
+  },
 };
 
 export function eligible(pool, where) {
   const keys = where ? Object.keys(where) : [];
   if (!keys.length) return pool;
-  const best = Math.max(...pool.map((c) => c.score));
-  return pool.filter((cell) => keys.every((key) => FILTERS[key].test(cell, where[key], best)));
+  const others = keys.filter((key) => key !== "scoreWithin");
+  const kept = pool.filter((cell) => others.every((key) => FILTERS[key].test(cell, where[key], null, pool)));
+  if (!keys.includes("scoreWithin")) return kept;
+  const best = Math.max(...kept.map((c) => c.score));
+  return kept.filter((cell) => FILTERS.scoreWithin.test(cell, where.scoreWithin, best));
 }
 
 export function ruleText(rule, cells = cellData()) {
@@ -198,9 +209,9 @@ export function resolveSheet(preset, cells = cellData()) {
 }
 
 export const SHEET_HEADER = [
-  "# PV Stack role sheet. One line per role; each value is a pv-* droid name (or a list for panels).",
+  "# pvstack role sheet. One line per role; each value is a pv-* droid name (or a list for panels).",
   "# Pass the value as the Task tool's subagent_type. `inherit` means use the built-in `worker` droid on the parent model.",
-  "# Evidence for every choice: docs/model-evidence.md in the PV Stack repository.",
+  "# Evidence for every choice: docs/model-evidence.md in the pvstack repository.",
 ];
 
 export function renderSheet(preset, rows) {

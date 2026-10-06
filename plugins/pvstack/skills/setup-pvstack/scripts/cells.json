@@ -19,7 +19,12 @@
       "minutes": 6.89,
       "inferred": false,
       "inferredName": null,
-      "v3Note": null
+      "v3Note": null,
+      "droid": {
+        "resolvedRate": 0.8696,
+        "credits": 26368,
+        "minutes": 0.84
+      }
     },
     {
       "name": "pv-sol-high",
@@ -38,7 +43,12 @@
       "minutes": 10.2219,
       "inferred": false,
       "inferredName": null,
-      "v3Note": null
+      "v3Note": null,
+      "droid": {
+        "resolvedRate": 0.8696,
+        "credits": 46092,
+        "minutes": 1.51
+      }
     },
     {
       "name": "pv-sol-xhigh",
@@ -57,7 +67,8 @@
       "minutes": 15.3716,
       "inferred": false,
       "inferredName": null,
-      "v3Note": null
+      "v3Note": null,
+      "droid": null
     },
     {
       "name": "pv-opus-medium",
@@ -80,7 +91,8 @@
       "minutes": 18.6446,
       "inferred": false,
       "inferredName": null,
-      "v3Note": null
+      "v3Note": null,
+      "droid": null
     },
     {
       "name": "pv-opus-high",
@@ -103,7 +115,8 @@
       "minutes": 21.4192,
       "inferred": false,
       "inferredName": null,
-      "v3Note": null
+      "v3Note": null,
+      "droid": null
     },
     {
       "name": "pv-grok-high",
@@ -126,7 +139,8 @@
       "minutes": 25.3587,
       "inferred": false,
       "inferredName": null,
-      "v3Note": null
+      "v3Note": null,
+      "droid": null
     },
     {
       "name": "pv-grok-xhigh",
@@ -149,7 +163,8 @@
       "minutes": 28.4804,
       "inferred": false,
       "inferredName": null,
-      "v3Note": null
+      "v3Note": null,
+      "droid": null
     },
     {
       "name": "pv-ds-low",
@@ -168,7 +183,12 @@
       "minutes": 8.4,
       "inferred": true,
       "inferredName": "V4-Flash",
-      "v3Note": null
+      "v3Note": null,
+      "droid": {
+        "resolvedRate": 0.8551,
+        "credits": 11558,
+        "minutes": 1
+      }
     },
     {
       "name": "pv-ds-high",
@@ -187,7 +207,12 @@
       "minutes": 12,
       "inferred": true,
       "inferredName": "V4-Flash",
-      "v3Note": null
+      "v3Note": null,
+      "droid": {
+        "resolvedRate": 0.8676,
+        "credits": 14271.5,
+        "minutes": 1.21
+      }
     },
     {
       "name": "pv-ds-max",
@@ -206,7 +231,12 @@
       "minutes": 11.2,
       "inferred": true,
       "inferredName": "V4-Flash",
-      "v3Note": "Third-best cell on the whole v3 board, and it scored higher and cost less than high."
+      "v3Note": "Third-best cell on the whole v3 board, and it scored higher and cost less than high.",
+      "droid": {
+        "resolvedRate": 0.8485,
+        "credits": 32796.5,
+        "minutes": 2.34
+      }
     }
   ]
 }

@@ -28,10 +28,10 @@
  */
 
 export const meta = {
-  title: "The PV Stack Playbook",
+  title: "The pvstack Playbook",
   tagline: "Ship with agents. Prove every step.",
   summary:
-    "A beginner's guide to pstack, the set of skills Lauren Tan (poteto) uses to ship thousands of PRs a month, and to PV Stack, which runs pstack on Droid. The habits work with any agent that can load skills.",
+    "A beginner's guide to pstack, the set of skills Lauren Tan (poteto) uses to ship thousands of PRs a month, and to pvstack, which runs pstack on Droid. The habits work with any agent that can load skills.",
   repo: "https://github.com/NDilanka/pvstack",
   sources: [
     { id: "p1", title: "Part 1: Verification is all you need", url: "https://x.com/poteto/status/2094457600259842065" },
@@ -131,7 +131,7 @@ export const chapters = [
     kicker: "The idea",
     title: "pstack in 60 seconds",
     plain: [
-      "pstack is a set of skills for AI coding agents. A skill is a folder of instructions that the agent reads when you call it by name, or when another skill runs it. Lauren Tan, known as poteto, wrote pstack and uses it to ship thousands of pull requests a month. PV Stack is the same skills packaged for Droid, with a model chosen for each kind of work.",
+      "pstack is a set of skills for AI coding agents. A skill is a folder of instructions that the agent reads when you call it by name, or when another skill runs it. Lauren Tan, known as poteto, wrote pstack and uses it to ship thousands of pull requests a month. pvstack is the same skills packaged for Droid, with a model chosen for each kind of work.",
       "The core idea is verification. The agent checks its own work in the real app, the way a person would. Then it can keep going until the task is done, and you stop being the bottleneck. poteto treats a good verification skill as critical infrastructure, not as one more skill.",
       "Every task follows one loop. You say the goal. The agent makes a small change. It drives the real app to check the change. It hands you proof, such as a video, a screenshot, command output, or a number.",
       "The one habit to learn is to say what you want and how to check it. You don't list steps or skills. `/poteto-mode` picks the workflow for you.",
@@ -151,17 +151,17 @@ export const chapters = [
     kicker: "Install",
     title: "Install pstack and run your first task",
     plain: [
-      "Install the skills for your agent tool. The platform table lists the steps for Droid, Claude Code, Cursor, Codex, and other tools. On Droid, PV Stack installs with two commands.",
+      "Install the skills for your agent tool. The platform table lists the steps for Droid, Claude Code, Cursor, Codex, and other tools. On Droid, pvstack installs with two commands.",
       "To check that the install worked, start a new session. Type `/poteto-mode`, or `$poteto-mode` on Codex, and see the skill load. You can also ask the agent to list its skills and look for `poteto-mode` in the list.",
       "On Droid, run `/setup-pvstack` next. It asks you to pick a mode (Balanced, Budget, Quality, Fast, Safe or Open) and writes a small file called the role sheet. The role sheet tells each skill which model to use for each job. On Cursor, the upstream version of this skill is `/setup-pstack`.",
       "Then start every real task with `/poteto-mode`. You don't pick a playbook. It reads your request and picks one. Typing it applies the skill to that request. It may fade as the chat moves on, so type it again when you start the next task. On Cursor, a Custom Mode keeps it on every turn. The Cursor section under \"Install on your tool\" shows how.",
       "When you're stuck, or can't tell which skill fits, type `/poteto-help` with your question. It answers, hands you a prompt to send, and links the file the answer came from. It doesn't start the work, so nothing runs until you send that prompt.",
     ],
     deeper: [
-      "The role sheet lives at `~/.factory/pvstack-models.md`. Without it, PV Stack uses the Balanced sheet. Skills read the sheet the next time they spawn a subagent, so you don't need to restart. At the end, `/setup-pvstack` checks whether the project can already prove app behavior. If it can't, it offers once to run `/create-verification-skill`.",
-      "pstack's skills are written for Cursor. They name Cursor tools such as `/loop`, cloud agents, and the `control-ui` and `control-cli` skills from Cursor's `cursor-team-kit` plugin. PV Stack maps each of these to a Droid tool in `skills/poteto-mode/references/droid-tools.md`. On another tool, give your agent that file as an example and ask it to map the same names to your tool.",
+      "The role sheet lives at `~/.factory/pvstack-models.md`. Without it, pvstack uses the Balanced sheet. Skills read the sheet the next time they spawn a subagent, so you don't need to restart. At the end, `/setup-pvstack` checks whether the project can already prove app behavior. If it can't, it offers once to run `/create-verification-skill`.",
+      "pstack's skills are written for Cursor. They name Cursor tools such as `/loop`, cloud agents, and the `control-ui` and `control-cli` skills from Cursor's `cursor-team-kit` plugin. pvstack maps each of these to a Droid tool in `skills/poteto-mode/references/droid-tools.md`. On another tool, give your agent that file as an example and ask it to map the same names to your tool.",
       "Your first task should be real and small. The guide suggests a prompt like the second one below. Watch the todo list. Its first items are the Feature playbook's steps.",
-      "In headless `droid exec`, the Task tool is blocked below `--auto high`, so playbooks that delegate do their work in the parent. Interactive sessions can spawn subagents at any autonomy level. To update PV Stack, run `droid plugin update pvstack@pvstack --scope user`.",
+      "In headless `droid exec`, the Task tool is blocked below `--auto high`, so playbooks that delegate do their work in the parent. Interactive sessions can spawn subagents at any autonomy level. To update pvstack, run `droid plugin update pvstack@pvstack --scope user`.",
     ],
     prompts: [
       { intent: "Pick a mode and write the role sheet (Droid)", text: "/setup-pvstack" },
@@ -219,7 +219,7 @@ export const chapters = [
     ],
     deeper: [
       "In Part 1, poteto recommends cloud machines over local worktrees. Worktrees use a lot of disk and machine resources, and one machine may run about 10 agents that way, depending on the repo and the hardware. A cloud machine can install dependencies, run the app, and record video like a local one. Good dev experience, such as seed data and one-command startup, makes that setup easier.",
-      "On Droid, subagents run where the parent runs. For isolated parallel work, PV Stack gives each worker its own git worktree and says so in the worker's prompt. Worktrees pile up, so the Worktree cleanup playbook deletes only the ones that evidence clears and pauses on any with uncommitted work.",
+      "On Droid, subagents run where the parent runs. For isolated parallel work, pvstack gives each worker its own git worktree and says so in the worker's prompt. Worktrees pile up, so the Worktree cleanup playbook deletes only the ones that evidence clears and pauses on any with uncommitted work.",
       "Pick the fan-out skill by the job. Use `/swarm` for coverage, such as one worker per package or one per Feature Map entry. It also confirms a perf win with a big enough sample. Use `/arena` for a design or code bakeoff. Using `/arena` for coverage is a listed pitfall.",
       "Part 1 describes the main agent as a coordinator that manages and supervises other agents. The work happens elsewhere, and the main agent's context stays clean.",
     ],
@@ -498,7 +498,7 @@ export const lines = {
           "The Opening a PR playbook works from a worktree. It runs a cleanup pass over the diff before each commit and `/no-comments` before review, then writes the title in Conventional Commits form. The description has short sections such as Why, What changed, Scope, Blast Radius, and Verification. Five narrow PRs beat one large one, and stacked follow-ups beat a growing branch.",
           "Babysit takes blockers in order. Conflicts come first, then review threads, then CI. It batches known fixes into one push so checks restart once. Comments from people and from an automated reviewer get skeptical triage. A real finding gets a fix. Noise gets dismissed with a reason.",
           "Green is not the same as safe. Shipping sends a fresh agent to verify each PR live, and the agent that judges a change never wrote it. It lands only the unbroken run of verified PRs from the bottom of the stack.",
-          "The cleanup pass is `/deslop`, from Cursor's `cursor-team-kit` plugin. On Droid, PV Stack maps it to the built-in `simplify` skill. On other tools, ask in plain words to remove narrating comments, unneeded guards, dead compatibility code, and unrelated edits.",
+          "The cleanup pass is `/deslop`, from Cursor's `cursor-team-kit` plugin. On Droid, pvstack maps it to the built-in `simplify` skill. On other tools, ask in plain words to remove narrating comments, unneeded guards, dead compatibility code, and unrelated edits.",
         ],
         skills: ["poteto-mode", "no-comments", "unslop", "interrogate"],
         prompts: [
@@ -798,7 +798,7 @@ export const sharedStations = [{ id: "verify", station: "Verify" }, { id: "ship"
 /** @type {{ id: string, oneLine: string, trigger: string, needsRunningApp: boolean }[]} id = skill directory name */
 export const skills = [
   { id: "poteto-mode", oneLine: "The front door. Describe the goal, and it picks a playbook and runs the other skills as the steps need them.", trigger: "Start almost every real task with it.", needsRunningApp: false },
-  { id: "setup-pvstack", oneLine: "Picks a mode on Droid and writes the role sheet that maps each role to a model. Upstream pstack on Cursor has `/setup-pstack` instead.", trigger: "Once after you install PV Stack, and again to change a role.", needsRunningApp: false },
+  { id: "setup-pvstack", oneLine: "Picks a mode on Droid and writes the role sheet that maps each role to a model. Upstream pstack on Cursor has `/setup-pstack` instead.", trigger: "Once after you install pvstack, and again to change a role.", needsRunningApp: false },
   { id: "poteto-help", oneLine: "Answers a question about pstack, such as which skill fits or why a run went wrong, and hands you a prompt to send. It doesn't start the work.", trigger: "When you're stuck, or can't tell which skill, playbook, or principle fits.", needsRunningApp: false },
   { id: "create-verification-skill", oneLine: "Studies your repo and writes a project-local `verify-<app>` skill that launches, drives, and proves your app, plus a Feature Map.", trigger: "As soon as your app starts from one command.", needsRunningApp: true },
   { id: "maintain-verification-skill", oneLine: "Drives every feature in the Feature Map and ships at most one PR of proven fixes to the verification skill.", trigger: "Daily, or whenever the app changed.", needsRunningApp: true },
@@ -897,7 +897,7 @@ export const pitfalls = [
   { dont: "Run parallel agents in one worktree.", do: "Ask for a separate worktree per attempt.", sources: ["guide/10-recipes-and-pitfalls.md"] },
   { dont: "Use `/arena` for coverage.", do: "Use `/swarm` to split slices or race declared arms. Use `/arena` when every agent should attempt the same design or code brief.", sources: ["guide/10-recipes-and-pitfalls.md"] },
   { dont: "Accept every review comment.", do: "Fix the real findings and dismiss noise with a reason. `/interrogate` sorts findings into act-on and dismissed buckets, and you can override either way.", sources: ["guide/10-recipes-and-pitfalls.md"] },
-  { dont: "Treat `auto` as a model name.", do: "Read `auto`, `inherit-parent`, and PV Stack's `inherit` as one instruction. The role runs on the parent chat's model.", sources: ["guide/10-recipes-and-pitfalls.md", "skills/setup-pvstack"] },
+  { dont: "Treat `auto` as a model name.", do: "Read `auto`, `inherit-parent`, and pvstack's `inherit` as one instruction. The role runs on the parent chat's model.", sources: ["guide/10-recipes-and-pitfalls.md", "skills/setup-pvstack"] },
   { dont: "Report success off a green build.", do: "Ask for the real command, flow, stored value, or profile, and expect the evidence in the reply.", sources: ["guide/10-recipes-and-pitfalls.md"] },
   { dont: "Write a `SKILL.md` freehand.", do: "Route it through the Authoring or modifying a skill playbook, so validation and review happen.", sources: ["guide/10-recipes-and-pitfalls.md"] },
   { dont: "Accept the agent's first design.", do: "Ask for prototypes, or run `/architect`, which compares at least two designs before it builds.", sources: ["p2"] },
@@ -934,7 +934,7 @@ export const glossary = [
   { term: "PR", plain: "A pull request, a proposed change that others review before it merges into the main branch." },
   { term: "PR stack", plain: "A chain of small PRs where each one builds on the one below it. You land them from the bottom up." },
   { term: "Role sheet", plain: "The file `~/.factory/pvstack-models.md`. It maps each kind of work, such as code or review, to a droid with a fixed model. `/setup-pvstack` writes it." },
-  { term: "Droid", plain: "Factory's coding agent. In PV Stack, a droid named `pv-*` is also a preset agent with one fixed model and effort level." },
+  { term: "Droid", plain: "Factory's coding agent. In pvstack, a droid named `pv-*` is also a preset agent with one fixed model and effort level." },
   { term: "Custom Mode", plain: "A Cursor feature that keeps a skill such as `/poteto-mode` on every turn until you exit it. Pick the skill from the `/` menu with Option+Enter on Mac or Alt+Enter on Windows. Without one, typing `/poteto-mode` applies it to one request, and it may fade as the chat moves on." },
 ];
 
@@ -942,7 +942,7 @@ export const glossary = [
 export const routing = {
   plain: [
     "pstack sends different jobs to different models. A fast, cheap model can search code. A careful model can write prose and make judgment calls. A strong model takes the hardest changes. Each kind of job is called a role.",
-    "PV Stack picks the model for each role from VulcanBench, an open benchmark of real engineering tasks that reports score, time, and cost. `/setup-pvstack` offers six modes. Balanced is the default, and Budget, Quality, Fast, Safe and Open trade score, minutes, cost and safety differently.",
+    "pvstack picks the model for each role from VulcanBench, an open benchmark of real engineering tasks that reports score, time, and cost. `/setup-pvstack` offers six modes. Balanced is the default, and Budget, Quality, Fast, Safe and Open trade score, minutes, cost and safety differently.",
     "You can override any role. The table below lists every role and the droid each mode gives it. A droid here is a preset agent with one fixed model and effort level.",
   ],
   deeper: [

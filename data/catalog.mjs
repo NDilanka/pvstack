@@ -66,7 +66,7 @@ export const V3_CELLS = [
   },
 ];
 
-export const V3_NOTE = "VulcanBench measured V4-Flash, not V4.1 Flash. Droid lists V4.1 Flash at 0.12x and marks V4 Flash 0731 deprecated.";
+export const V3_NOTE = "VulcanBench measured V4-Flash, not V4.1 Flash. Droid lists V4.1 Flash at 0.12x and marks V4 Flash 0731 deprecated. Its Droid run is under Measured in Droid.";
 
 /** Estimated from each run's tokens at xAI list rates. VulcanBench published no cost for the Grok 4.7 sweep. */
 export const COST_ESTIMATES = [

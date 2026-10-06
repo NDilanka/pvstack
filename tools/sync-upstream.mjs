@@ -6,7 +6,7 @@
 //   node tools/sync-upstream.mjs --check         exit 1 if the tree differs from a fresh sync
 //   node tools/sync-upstream.mjs --source DIR    use an existing cursor/plugins checkout
 //
-// The PV Stack layer (pv-* droids, setup-pvstack, droid-tools.md) is never touched:
+// The pvstack layer (pv-* droids, setup-pvstack, droid-tools.md) is never touched:
 // the script deletes only files it wrote on the previous sync (.upstream-files.json).
 
 import { execFileSync } from "node:child_process";
@@ -108,7 +108,7 @@ function droidNote(skillRelPath) {
       : `${toSkills}poteto-mode/references/droid-tools.md`;
   return (
     `${NOTE_MARKER}\n` +
-    `> **PV Stack on Droid.** Before following this skill, read [droid-tools.md](${target}). ` +
+    `> **pvstack on Droid.** Before following this skill, read [droid-tools.md](${target}). ` +
     "It maps the Cursor tools, Task parameters, and model slugs named below to Droid tools and `pv-*` droids, " +
     "and says where the role sheet lives.\n\n"
   );
@@ -213,7 +213,7 @@ function upstreamVersion(upstream) {
 function pinText(sha, version) {
   return `# Upstream pin
 
-PV Stack tracks Lauren Tan's pstack directly from Cursor's plugin repository.
+pvstack tracks Lauren Tan's pstack directly from Cursor's plugin repository.
 
 - Repository: ${REPO.replace(/\.git$/, "")}
 - Path: \`${UPSTREAM_DIR}/\`

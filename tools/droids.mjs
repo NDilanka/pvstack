@@ -28,12 +28,12 @@ export const CELLS = [
 function render(cell) {
   return `---
 name: ${cell.name}
-description: "PV Stack role droid pinned to ${cell.label}. ${cell.use} Spawn it when the PV Stack role sheet maps a role to ${cell.name}."
+description: "pvstack role droid pinned to ${cell.label}. ${cell.use} Spawn it when the pvstack role sheet maps a role to ${cell.name}."
 model: ${cell.model}
 reasoningEffort: ${cell.effort}
 ---
 
-You are a PV Stack subagent running on ${cell.label}. The parent picked you because its role sheet maps the current role to \`${cell.name}\`.
+You are a pvstack subagent running on ${cell.label}. The parent picked you because its role sheet maps the current role to \`${cell.name}\`.
 
 - If the prompt says to operate as \`poteto-agent\`, load the \`poteto-mode\` skill and read its \`SKILL.md\` in full before any work, including the Principles index, then follow it. Open a leaf \`principle-*\` skill whenever you apply that principle. If the Skill tool will not load a skill, read its \`SKILL.md\` from the plugin's \`skills/\` directory instead.
 - If the prompt marks the task read-only, do not create, edit, or delete files, and do not run commands that change state.

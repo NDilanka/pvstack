@@ -57,6 +57,7 @@ const CELL_FIELDS = [
   "inferred",
   "inferredName",
   "v3Note",
+  "droid",
 ];
 
 export function cellsFileText(cells = cellData()) {
@@ -101,9 +102,12 @@ function replaceTable(readme, table) {
   return readme.slice(0, start + TABLE_START.length) + "\n" + table + "\n" + readme.slice(end);
 }
 
+/** Sheets, tables and docs resolve over the shipped cells, so they match what a user's resolver sees. */
+export const shippedCells = () => JSON.parse(cellsFileText()).cells;
+
 function main() {
   const check = process.argv.includes("--check");
-  const cells = cellData();
+  const cells = shippedCells();
   const drift = [];
   const names = Object.keys(PRESETS);
   const presets = Object.fromEntries(names.map((name) => [name, validatePreset(PRESETS[name], { name, cells })]));

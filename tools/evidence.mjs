@@ -10,8 +10,8 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { MODELS, V3_NOTE } from "../data/catalog.mjs";
-import { GROUPS, PRESETS, classOf, resolveSheet, ruleFor, ruleText, ROLES } from "./presets.mjs";
-import { cellData, loadSnapshot } from "./vulcanbench.mjs";
+import { GROUPS, PRESETS, classOf, resolveSheet, ruleFor, ruleText, ROLES, shippedCells } from "./presets.mjs";
+import { loadSnapshot } from "./vulcanbench.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const docPath = path.join(root, "docs", "model-evidence.md");
@@ -20,7 +20,25 @@ const MARKERS = {
   cells: ["<!-- vulcanbench:cells -->", "<!-- /vulcanbench:cells -->"],
   inferred: ["<!-- vulcanbench:inferred -->", "<!-- /vulcanbench:inferred -->"],
   presets: ["<!-- vulcanbench:presets -->", "<!-- /vulcanbench:presets -->"],
+  droid: ["<!-- droid-bench:cells -->", "<!-- /droid-bench:cells -->"],
 };
+const droidBenchPath = path.join(root, "data", "droid-bench.json");
+
+const pct = (x) => `${(x * 100).toFixed(1)}%`;
+
+function droidTable(cells) {
+  const bench = JSON.parse(fs.readFileSync(droidBenchPath, "utf8"));
+  const rows = Object.entries(bench.cells).map(([name, b]) => {
+    const cell = cells.find((c) => c.name === name);
+    const range = b.resolvedRateRange[0] === b.resolvedRateRange[1] ? "" : ` (${pct(b.resolvedRateRange[0])} to ${pct(b.resolvedRateRange[1])})`;
+    return `| \`${name}\` | ${MODELS[cell.model].vbName} / ${cell.effort} | ${pct(b.resolvedRate)}${range} | ${pct(b.functional)} | ${b.medianMinutes.toFixed(1)} | ${b.medianCredits == null ? "n/a" : Math.round(b.medianCredits).toLocaleString("en-US")} | ${b.tasks} × ${b.repeats} (${b.infraFailures} infra) |`;
+  });
+  return [
+    "| Droid | Model / effort | Resolved (range across repeats) | Hidden tests passed | Median min | Median credits | Tasks × repeats |",
+    "| --- | --- | --- | --- | --- | --- | --- |",
+    ...rows,
+  ].join("\n");
+}
 
 const usd = (value, estimated) => `$${value.toFixed(2)}${estimated ? " (estimate)" : ""}`;
 const score = (value) => `${+value.toFixed(2)}%`;
@@ -98,13 +116,14 @@ function replaceBetween(text, [start, end], body) {
   return text.slice(0, a + start.length) + "\n" + body + "\n" + text.slice(b);
 }
 
-export function renderDoc(cells = cellData(), snapshot = loadSnapshot()) {
+export function renderDoc(cells = shippedCells(), snapshot = loadSnapshot()) {
   let text = fs.readFileSync(docPath, "utf8");
   if (!/^Data pulled on \d{4}-\d{2}-\d{2} from:$/m.test(text)) throw new Error("docs/model-evidence.md has no \"Data pulled on <date> from:\" line");
   text = text.replace(/^Data pulled on \d{4}-\d{2}-\d{2} from:$/m, `Data pulled on ${snapshot.pulled} from:`);
   text = replaceBetween(text, MARKERS.cells, measuredTable(cells));
   text = replaceBetween(text, MARKERS.inferred, inferredTable(cells));
   text = replaceBetween(text, MARKERS.presets, presetsSection(cells));
+  text = replaceBetween(text, MARKERS.droid, droidTable(cells));
   return text;
 }
 

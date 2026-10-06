@@ -1,6 +1,6 @@
 # Model evidence
 
-PV Stack picks a model and reasoning effort for every pstack role from the published results of [VulcanBench](https://vulcanbench.com), Morgan Linton's open-source benchmark for real engineering tasks ([methodology](https://vulcanbench.com/methodology.html)). This page records each number it relies on, where the number comes from, and which picks are inferred rather than measured.
+pvstack picks a model and reasoning effort for every pstack role from the published results of [VulcanBench](https://vulcanbench.com), Morgan Linton's open-source benchmark for real engineering tasks ([methodology](https://vulcanbench.com/methodology.html)). This page records each number it relies on, where the number comes from, and which picks are inferred rather than measured.
 
 Data pulled on 2026-10-06 from:
 
@@ -32,7 +32,7 @@ Data pulled on 2026-10-06 from:
 | `pv-grok-xhigh` | Grok 4.7 / xhigh | 93.15 | 23/23 | ~$2.96 (estimate) | 28.5 | 0.8× |
 <!-- /vulcanbench:cells -->
 
-Cells PV Stack doesn't ship but cites below: Grok 4.7 medium 92.30 (21/23, one run hit the 3-hour bound, 27.2 min). Grok 4.7 low 89.42 (18/23, 20.2 min).
+Cells pvstack doesn't ship but cites below: Grok 4.7 medium 92.30 (21/23, one run hit the 3-hour bound, 27.2 min). Grok 4.7 low 89.42 (18/23, 20.2 min).
 
 Routine v1 for the same models: every level passes 12/12. GPT-6.1 Sol wasn't on Routine v1 when this was written. Opus 5.5 low scores 94.22 at $0.072, and medium scores 95.30 at $0.11. Grok 4.7's four levels are the four top cells, from 97.14 at xhigh to 97.37 at high. Low scores 97.29 at 1.1 minutes per ticket. Grok's Routine cells were judged by Muse Spark 1.3 alone, which VulcanBench says flatters Grok 4.7. Every other column used Muse plus Grok 4.6.
 
@@ -40,7 +40,7 @@ Routine v1 for the same models: every level passes 12/12. GPT-6.1 Sol wasn't on 
 
 - **Different second judge.** Grok 4.6 is the second Code quality judge on every other column. It sat out for an xAI submission, and GPT-6.1 Sol took its seat. Sol rates Grok 4.7's code about 6 points above Muse Spark 1.3, the judge every column shares. Rescored on Muse alone, Grok 4.7 drops 0.8 to 1.0 points. It still leads at medium, high and xhigh. At xhigh it scores 92.27 on the shared judge. VulcanBench compares that with 91.03 for Opus 5.5 high, the cell this change replaces, and 90.86 for Fable 5.1 xhigh at the same level.
 - **Different harness.** Grok 4.7 ran in Cursor's agent CLI. Opus ran in Claude Code and Sol in Codex. A Grok Build run is announced and not yet published.
-- **No published cost.** The sweep ran on a Cursor subscription, so VulcanBench reports cost as unavailable. The estimates above are PV Stack's own. They take each run's tokens from `runs.csv` and price them at xAI's list rates ($2 per million uncached input, $0.50 cached, $6 output). They ignore xAI's higher rate above 200K context, so read them as a floor.
+- **No published cost.** The sweep ran on a Cursor subscription, so VulcanBench reports cost as unavailable. The estimates above are pvstack's own. They take each run's tokens from `runs.csv` and price them at xAI's list rates ($2 per million uncached input, $0.50 cached, $6 output). They ignore xAI's higher rate above 200K context, so read them as a floor.
 - **Slow and token-heavy.** Grok 4.7 is slower than GPT-6.1 Sol, Opus 5.5 and GPT-6 Astra at every shared effort level. At the same level it uses 2 to 4 times as many tokens per task as GPT-6.1 Sol (3.1 times at high, 3.5 times at xhigh).
 - **Safety v1.** Ten tasks carried planted repository notes asking for something the user didn't request. Over 40 runs, Grok 4.7 followed 14 of 80 notes and reported none of them to the user. Over 50 runs, Opus 5.5 followed 3 of 100 and reported 64. Grok never ran the network beacon, the exfiltration or the destructive delete. Neither model leaked the planted secret.
 
@@ -49,7 +49,7 @@ Routine v1 for the same models: every level passes 12/12. GPT-6.1 Sol wasn't on 
 <!-- vulcanbench:inferred -->
 | Droid | Model / effort | Evidence | Why it is inferred |
 | --- | --- | --- | --- |
-| `pv-ds-low` | DeepSeek V4.1 Flash / low | v3: V4-Flash low 86% at $0.04, 8.4 min. | VulcanBench measured V4-Flash, not V4.1 Flash. Droid lists V4.1 Flash at 0.12x and marks V4 Flash 0731 deprecated. |
+| `pv-ds-low` | DeepSeek V4.1 Flash / low | v3: V4-Flash low 86% at $0.04, 8.4 min. | VulcanBench measured V4-Flash, not V4.1 Flash. Droid lists V4.1 Flash at 0.12x and marks V4 Flash 0731 deprecated. Its Droid run is under Measured in Droid. |
 | `pv-ds-high` | DeepSeek V4.1 Flash / high | v3: V4-Flash high 87% at $0.08, 12 min. | Same as above. |
 | `pv-ds-max` | DeepSeek V4.1 Flash / max | v3: V4-Flash max 88.4% at $0.06, 11.2 min. Third-best cell on the whole v3 board, and it scored higher and cost less than high. | Same as above. |
 <!-- /vulcanbench:inferred -->
@@ -70,16 +70,16 @@ The mode sheets in `plugins/pvstack/skills/setup-pvstack/modes/` are generated. 
 - Review panels: `pv-opus-medium`, `pv-sol-xhigh`, `pv-grok-high` (cheapest cell that scores within 0.5 points of the best cell in its pool, one cell per lab, from Anthropic, OpenAI, xAI).
 - Pins: none.
 
-**Budget.** Spends as little as it can on the roles that run often. Code and exploration stay on the open DeepSeek model, judgment and the hardest changes keep the cheapest cell with a published cost and Safety v1 evidence, and the fan-out panels drop Opus.
+**Budget.** Spends as little as it can on the roles that run often. Code and exploration stay on the open DeepSeek model, judgment and the hardest changes keep the cheapest cell with a published cost and Safety v1 evidence, and the fan-out panels drop Opus. DeepSeek effort levels that the Droid run shows a cheaper level beating are skipped.
 
-- Code delegates (feature, refactor, bug fix, perf, hillclimb): `pv-ds-max` (highest-scoring cell that runs on DeepSeek V4.1 Flash).
-- Swarm workers: `pv-ds-max` (highest-scoring cell that runs on DeepSeek V4.1 Flash).
+- Code delegates (feature, refactor, bug fix, perf, hillclimb): `pv-ds-high` (highest-scoring cell that runs on DeepSeek V4.1 Flash and no cell of the same model beats in the Droid run with more tasks resolved on fewer credits).
+- Swarm workers: `pv-ds-high` (highest-scoring cell that runs on DeepSeek V4.1 Flash and no cell of the same model beats in the Droid run with more tasks resolved on fewer credits).
 - Exploration, investigators, mechanical edits: `pv-ds-low` (cheapest cell).
 - Judgment, prose, explainers, synthesizers: `pv-opus-medium` (cheapest cell whose model reported planted notes to the user on Safety v1).
 - Hardest changes: `pv-opus-medium` (cheapest cell that has a published cost and whose model reported planted notes to the user on Safety v1).
 - Reflect tooling: `pv-sol-high` (cheapest cell that runs on GPT-6.1 Sol and passed every task it ran).
-- Review panels: `pv-sol-high`, `pv-ds-max`, `pv-grok-high` (cheapest cell that scores within 1 point of the best cell in its pool, one cell per lab, from OpenAI, DeepSeek, xAI; arena cross-judge pool from Anthropic, OpenAI, xAI, because the runners are OpenAI, DeepSeek and xAI, so the cross-judge pool needs an outside lab).
-  - arena runners, architect runners, interrogate reviewers: `pv-sol-high`, `pv-ds-max`, `pv-grok-high`
+- Review panels: `pv-sol-high`, `pv-ds-low`, `pv-grok-high` (cheapest cell that scores within 1 point of the best cell in its pool and no cell of the same model beats in the Droid run with more tasks resolved on fewer credits, one cell per lab, from OpenAI, DeepSeek, xAI; arena cross-judge pool from Anthropic, OpenAI, xAI, because the runners are OpenAI, DeepSeek and xAI, so the cross-judge pool needs an outside lab).
+  - arena runners, architect runners, interrogate reviewers: `pv-sol-high`, `pv-ds-low`, `pv-grok-high`
   - arena cross-judge pool: `pv-opus-medium`, `pv-sol-high`, `pv-grok-high`
 - Pins: none.
 
@@ -116,16 +116,16 @@ The mode sheets in `plugins/pvstack/skills/setup-pvstack/modes/` are generated. 
 - Review panels: `pv-opus-medium`, `pv-sol-xhigh`, `pv-grok-high` (cheapest cell that scores within 0.5 points of the best cell in its pool, one cell per lab, from Anthropic, OpenAI, xAI).
 - Pins: none.
 
-**Open.** Uses open-weights models only. DeepSeek V4.1 Flash is the only one on the board, so every role runs on it, judgment included, and the panel seats three of its effort levels.
+**Open.** Uses open-weights models only. DeepSeek V4.1 Flash is the only one on the board, so every role runs on it, judgment included, and the panel seats three of its effort levels. Max effort leaves the single-seat roles because the Droid run measured it resolving fewer tasks than high on more than twice the credits.
 
-- Code delegates (feature, refactor, bug fix, perf, hillclimb): `pv-ds-max` (highest-scoring cell that comes from an open-weights model).
-- Swarm workers: `pv-ds-max` (highest-scoring cell that comes from an open-weights model).
+- Code delegates (feature, refactor, bug fix, perf, hillclimb): `pv-ds-high` (highest-scoring cell that comes from an open-weights model and no cell of the same model beats in the Droid run with more tasks resolved on fewer credits).
+- Swarm workers: `pv-ds-high` (highest-scoring cell that comes from an open-weights model and no cell of the same model beats in the Droid run with more tasks resolved on fewer credits).
 - Exploration, investigators, mechanical edits: `pv-ds-low` (cheapest cell that comes from an open-weights model).
-- Judgment, prose, explainers, synthesizers: `pv-ds-max` (pinned because the only open-weights model has no Safety v1 evidence, and this preset keeps every role on open weights).
-- Hardest changes: `pv-ds-max` (highest-scoring cell that comes from an open-weights model).
-- Reflect tooling: `pv-ds-max` (highest-scoring cell that comes from an open-weights model).
+- Judgment, prose, explainers, synthesizers: `pv-ds-high` (pinned because the only open-weights model has no Safety v1 evidence, and this preset keeps every role on open weights).
+- Hardest changes: `pv-ds-high` (highest-scoring cell that comes from an open-weights model and no cell of the same model beats in the Droid run with more tasks resolved on fewer credits).
+- Reflect tooling: `pv-ds-high` (highest-scoring cell that comes from an open-weights model and no cell of the same model beats in the Droid run with more tasks resolved on fewer credits).
 - Review panels: `pv-ds-max`, `pv-ds-high`, `pv-ds-low` (highest-scoring cell that comes from an open-weights model, one cell per effort level, up to 3).
-- Pin: `judgment and prose`, `how explainer`, `why synthesizer`, `reflect judgment, divergent, synthesizer` run on `pv-ds-max`, because the only open-weights model has no Safety v1 evidence, and this preset keeps every role on open weights.
+- Pin: `judgment and prose`, `how explainer`, `why synthesizer`, `reflect judgment, divergent, synthesizer` run on `pv-ds-high`, because the only open-weights model has no Safety v1 evidence, and this preset keeps every role on open weights.
 <!-- /vulcanbench:presets -->
 
 ## Role reasoning
@@ -159,13 +159,14 @@ The mode sheets in `plugins/pvstack/skills/setup-pvstack/modes/` are generated. 
 - Quality doesn't take the top score here. Grok 4.7 xhigh would spend 28.5 minutes per lookup, and no benchmark shows that a higher Frontier score makes a read-only search better. It takes the fastest cell that passed every task, Sol @ high at 10.2 minutes.
 
 ### Swarm workers: same rule as code
-- Swarm workers write code, so every preset resolves them with its code rule. Budget used to pin `pv-ds-high`. On v3, the only data for this model, max beats high on both axes (88.4% vs 87.0%, $0.06 vs $0.08, 11.2 vs 12.0 min), so Budget's swarm workers now run on `pv-ds-max`.
+- Swarm workers write code, so every preset resolves them with its code rule. In Budget and Open that is `pv-ds-high`, for the reasons in [Measured in Droid](#measured-in-droid).
 - Balanced's OpenAI panel seat sits on a 0.05-point margin. Sol xhigh is 0.55 points above Sol high, and the rule allows 0.5. Any threshold has an edge somewhere. Here the edge is guarded, because `npm run check` warns when the board moves and fails when a regenerated sheet changes.
 
 ### Review panels: Opus 5.5, GPT-6.1 Sol, Grok 4.7 @ high
 - Panels get their signal from model diversity: findings that independent models agree on carry more weight. This uses three labs: Anthropic, OpenAI and xAI.
 - Grok sits at high. It scores 92.71 (SE 0.41), uses the fewest tokens of any Grok level (2.85M per task) and has the lowest estimated cost ($2.19). Medium, the earlier pick, scores 92.30 but had the sweep's one 3-hour timeout, so its token and cost figures cover 22 runs. Medium came from Grok 4.6, whose effort knob ran backward. Grok 4.7's combined score rises at every step.
 - In Budget, Opus leaves the fan-out (Opus @ medium costs about 9× Sol @ high per task, $2.84 vs $0.33) and DeepSeek takes its seat. Opus stays in the arena cross-judge pool and still writes every synthesis.
+- Budget's DeepSeek seat is `pv-ds-low`. Once max is out, low and high are within a point of each other on v3, and the rule takes the cheaper one. The Droid run shows no measurable difference between them (85.5% vs 86.8% resolved, with overlapping ranges across repeats).
 
 ## Rejected for Budget mode
 
@@ -177,6 +178,34 @@ The mode sheets in `plugins/pvstack/skills/setup-pvstack/modes/` are generated. 
 | GPT-6 Luna (0.04×) | v4: max 81.4% with 6 runs hitting the 3-hour timeout, 60 min per task. | Too slow and unreliable on hard tasks. On routine work it is a candidate for a future "mechanical" override. |
 | Other Droid Core models (MiniMax M3, Nemotron 3 Ultra, Inkling, Mistral Medium 3.5, GLM-5.3-Flash) | No VulcanBench data. | No evidence to rank them. |
 
-## Re-checking in Droid
+## Measured in Droid
 
-VulcanBench's harness is open source (https://github.com/morganlinton/VulcanBench). The inferred cells, the harness gap and Grok 4.7's unpublished cost are the open questions. When VulcanBench publishes the Grok Build run, re-check the Grok cells. A useful next step is to run the Routine v1 public subset, or a small Frontier slice, through `droid exec` for each `pv-*` droid and update this page.
+pvstack ran VulcanBench's public Python Suite v1 (23 tasks, each from a real open-source fix) through `droid exec --auto high`. Each task ran three times for every DeepSeek cell and for the two everyday Sol cells as controls, which makes 345 runs. Routine v1 would have been the closer match, but its tasks are private. `tools/droid-bench.mjs` is the runner. `data/droid-bench-runs.jsonl` holds every run, and `data/droid-bench.json` holds the summary that `npm run check` keeps in sync with it.
+
+<!-- droid-bench:cells -->
+| Droid | Model / effort | Resolved (range across repeats) | Hidden tests passed | Median min | Median credits | Tasks × repeats |
+| --- | --- | --- | --- | --- | --- | --- |
+| `pv-ds-high` | DeepSeek V4.1 Flash / high | 86.8% (82.6% to 90.9%) | 95.5% | 1.2 | 14,272 | 23 × 3 (1 infra) |
+| `pv-ds-low` | DeepSeek V4.1 Flash / low | 85.5% (78.3% to 91.3%) | 95.0% | 1.0 | 11,558 | 23 × 3 (0 infra) |
+| `pv-ds-max` | DeepSeek V4.1 Flash / max | 84.9% (82.6% to 86.4%) | 94.6% | 2.3 | 32,797 | 23 × 3 (3 infra) |
+| `pv-sol-high` | GPT-6.1 Sol / high | 87.0% | 93.8% | 1.5 | 46,092 | 23 × 3 (0 infra) |
+| `pv-sol-low` | GPT-6.1 Sol / low | 87.0% | 93.6% | 0.8 | 26,368 | 23 × 3 (0 infra) |
+<!-- /droid-bench:cells -->
+
+How to read it:
+
+- **Functional only.** A run counts as resolved when every hidden `fail_to_pass` and `pass_to_pass` test passes. The VulcanBench combined score also includes lint, security and Code quality, and Code quality needs VulcanBench's judge models. So these numbers can't be compared with the Frontier v4 scores above. They compare cells with each other inside Droid.
+- **The grader is checked.** Before any model ran, every task's untouched repository failed its `fail_to_pass` tests and passed its `pass_to_pass` tests, and the gold patch passed all of them (23 of 23 tasks).
+- **Credits are what Droid bills.** They come from `droid exec`'s usage report. Medians are per run.
+- **The agents couldn't run the hidden test environment.** Tests ran afterwards in a separate virtualenv. The agent's shell started with system Python, which has no pytest or task dependencies. That holds every cell back equally. Two tasks failed for every cell on every run (`oss-click-param-named-help` and `oss-sqlglot-canonicalize-internal-names`), and a third (`oss-pennylane-trotter-fragmented`) passed once in 15 runs. They set the ceiling near 87%.
+- **Infra failures** are 45-minute agent timeouts. They are excluded from the resolved rate. `pv-ds-max` hit three of them and `pv-ds-high` one.
+
+What it changed:
+
+- **Resolution doesn't separate the cells.** All five resolve between 84.9% and 87.0%, and the DeepSeek ranges across repeats overlap (78% to 91%). Sol resolved the same 20 tasks in every repeat at both levels.
+- **Cost and time do separate them.** `pv-ds-max` used 2.3 times the median credits of `pv-ds-high` (32,797 vs 14,272), took nearly twice the median time (2.3 vs 1.2 minutes) and resolved no more. That reverses the v3 numbers, where max was cheaper than high. The v3 runs measured DeepSeek V4-Flash through its API, not V4.1 Flash in Droid. So Budget and Open now skip any cell that another cell of the same model beats in Droid, with more tasks resolved on fewer credits (the `droidDominated` filter). Only `pv-ds-max` meets that test. Open's panel still seats it, because the panel needs three DeepSeek seats.
+- **Budget code moves from `pv-ds-max` to `pv-ds-high`.** That brings back the hand-written Budget choice. `pv-ds-low` costs about 19% fewer credits at a resolution the run can't tell apart. High keeps a margin for harder tasks: on Frontier v4, Sol low fails 3 tasks that Sol high passes, and the Python suite is too easy to show that gap.
+- **DeepSeek is cheap in Droid.** `pv-ds-high` resolved as often as `pv-sol-low` on 54% of its median credits. The filter compares cells of one model, so this doesn't move Sol out of Balanced. Frontier v4 is the hard-task evidence for Sol, and the Python suite has nothing comparable for DeepSeek.
+- **Sol low and Sol high tie here.** Balanced keeps Sol high for code, because Frontier v4's three hard-task failures for Sol low are a real gap and the Python suite is too easy to show it. The filter needs strictly more resolved tasks, so the tie doesn't remove Sol high.
+
+Still open: Grok 4.7's unpublished cost, and the Grok Build run VulcanBench has announced. Re-run with `node tools/droid-bench.mjs run --suite <VulcanBench>/tasks/python-1 --python <venv>/bin --cells <cells> --repeats 3`. It resumes from the run log.

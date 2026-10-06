@@ -1,6 +1,6 @@
-# PV Stack on Droid: tool and model mapping
+# pvstack on Droid: tool and model mapping
 
-pstack's skills are written for Cursor. PV Stack keeps them close to upstream and resolves every Cursor-specific term here. When a skill and this file disagree about a tool, parameter, or model, this file wins.
+pstack's skills are written for Cursor. pvstack keeps them close to upstream and resolves every Cursor-specific term here. When a skill and this file disagree about a tool, parameter, or model, this file wins.
 
 ## Models: the role sheet
 
@@ -47,7 +47,7 @@ Subagents on Droid cannot spawn their own subagents or ask the user questions. A
 | `AskQuestion` (rewritten to `AskUser` during sync) | `AskUser`. Explain the options in plain words before the call. |
 | Cursor Custom Mode (Option+Enter / Alt+Enter, or Use as Mode) | Droid has no Custom Mode. Typing `/poteto-mode` applies it to that request. Start each new task with `/poteto-mode`. |
 | "The rule from `/setup-pvstack` applies to new chats" / "start a new chat" after setup | The role sheet is read the next time a skill spawns a subagent. No new chat needed. |
-| "Only `/setup-pvstack` loads from the user's words" | No PV Stack skill loads on its own. Type the skill's name, or let `/poteto-mode` run it. |
+| "Only `/setup-pvstack` loads from the user's words" | No pvstack skill loads on its own. Type the skill's name, or let `/poteto-mode` run it. |
 | `/loop` | The `Loop` tool (load it with ToolSearch `select:Loop`). For an overnight or hourly tick, use `Loop` or a scheduled automation (`CreateAutomation`). |
 | Cursor plan mode / `CreatePlan` | Droid spec mode (`ExitSpecMode` presents the plan). |
 | `cursor-team-kit` `/deslop` | The built-in `simplify` skill. |

@@ -1,8 +1,8 @@
 {
   "name": "pvstack",
-  "description": "PV Stack: Lauren Tan's pstack for Droid, with model routing chosen from VulcanBench data.",
+  "description": "pvstack: Lauren Tan's pstack for Droid, with model routing chosen from VulcanBench data.",
   "owner": {
-    "name": "PV Stack contributors"
+    "name": "pvstack contributors"
   },
   "plugins": [
     {

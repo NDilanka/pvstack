@@ -679,7 +679,7 @@ ${routingHtml(C, R)}
 ${agentsHtml(C)}
 </main>
 <footer class="foot">
-<p><a href="${esc(C.meta.repo)}">PV Stack on GitHub</a>. Based on ${C.meta.sources.map((s) => `<a href="${esc(s.url)}">${esc(s.title)}</a>`).join(" and ")} by Lauren Tan (poteto).</p>
+<p><a href="${esc(C.meta.repo)}">pvstack on GitHub</a>. Based on ${C.meta.sources.map((s) => `<a href="${esc(s.url)}">${esc(s.title)}</a>`).join(" and ")} by Lauren Tan (poteto).</p>
 </footer>
 </div>
 </div>
@@ -795,7 +795,7 @@ export function renderLlms(C) {
     join(["## Docs", ["- [The full playbook in markdown](playbook.md): every chapter, both lines, prompts, and checklists in reading order.", ...firsts].join("\n")]),
     join([
       "## Optional",
-      [`- [Interactive playbook](index.html): the same content with a line map, toggles, and saved checklists.`, `- [PV Stack repository](${C.meta.repo}): the skills, the guide, and the source of this playbook.`].join("\n"),
+      [`- [Interactive playbook](index.html): the same content with a line map, toggles, and saved checklists.`, `- [pvstack repository](${C.meta.repo}): the skills, the guide, and the source of this playbook.`].join("\n"),
     ]),
   ]) + "\n";
 }

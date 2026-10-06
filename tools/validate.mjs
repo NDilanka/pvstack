@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Structural checks for the PV Stack layer. Exit 1 on any failure.
+// Structural checks for the pvstack layer. Exit 1 on any failure.
 
 import fs from "node:fs";
 import path from "node:path";
@@ -7,8 +7,7 @@ import { fileURLToPath } from "node:url";
 import { MODELS } from "../data/catalog.mjs";
 import { loadCustomPreset, resolveSheet, validatePreset } from "../plugins/pvstack/skills/setup-pvstack/scripts/resolve.mjs";
 import { CELLS } from "./droids.mjs";
-import { PRESETS } from "./presets.mjs";
-import { cellData } from "./vulcanbench.mjs";
+import { PRESETS, shippedCells } from "./presets.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const plugin = path.join(root, "plugins", "pvstack");
@@ -22,7 +21,7 @@ for (const cell of CELLS) {
   if (!/^[a-z0-9_-]+$/.test(cell.name)) fail(`${cell.name}: invalid droid name`);
 }
 
-const cells = cellData();
+const cells = shippedCells();
 const labOf = new Map(cells.map((c) => [c.name, c.lab]));
 const modelOf = new Map(cells.map((c) => [c.name, c.model]));
 const effortOf = new Map(cells.map((c) => [c.name, c.effort]));

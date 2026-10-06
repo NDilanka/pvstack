@@ -1,10 +1,10 @@
 ---
 name: setup-pvstack
-description: Choose PV Stack's mode (Balanced, Budget, Quality, Fast, Safe, Open or a custom preset) and per-role droids, then write the role sheet every pstack skill reads. Use for /setup-pvstack, "configure pvstack models", "pvstack budget mode", "custom pvstack preset", or changing which model a pstack role uses.
+description: Choose pvstack's mode (Balanced, Budget, Quality, Fast, Safe, Open or a custom preset) and per-role droids, then write the role sheet every pstack skill reads. Use for /setup-pvstack, "configure pvstack models", "pvstack budget mode", "custom pvstack preset", or changing which model a pstack role uses.
 disable-model-invocation: true
 ---
 
-# Setup PV Stack
+# Setup pvstack
 
 Write `~/.factory/pvstack-models.md`. This is the role sheet that `poteto-mode` and the routed skills read to choose a `pv-*` droid for each role. See `../poteto-mode/references/droid-tools.md` for how the sheet is read.
 

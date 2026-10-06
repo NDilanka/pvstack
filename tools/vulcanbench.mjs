@@ -128,6 +128,8 @@ function movedRows(before, after) {
 /** Joins each CELL to its evidence. A cell's own board row wins over the v3 rows and the cost estimates. */
 export function cellData() {
   const snapshot = loadSnapshot();
+  const benchFile = path.join(root, "data", "droid-bench.json");
+  const droidBench = fs.existsSync(benchFile) ? JSON.parse(fs.readFileSync(benchFile, "utf8")).cells : {};
   const frontier = new Map(snapshot.frontier.map((r) => [`${r.model}|${r.effort}`, r]));
   const v3 = new Map(V3_CELLS.map((r) => [`${r.model}|${r.effort}`, r]));
   const estimates = new Map(COST_ESTIMATES.map((r) => [`${r.model}|${r.effort}`, r]));
@@ -154,6 +156,9 @@ export function cellData() {
       inferred: !row,
       inferredName: older?.boardName ?? null,
       v3Note: older?.note ?? null,
+      droid: droidBench[cell.name]
+        ? { resolvedRate: droidBench[cell.name].resolvedRate, credits: droidBench[cell.name].medianCredits, minutes: droidBench[cell.name].medianMinutes }
+        : null,
     };
   });
 }

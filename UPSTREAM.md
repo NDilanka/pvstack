@@ -1,6 +1,6 @@
 # Upstream pin
 
-PV Stack tracks Lauren Tan's pstack directly from Cursor's plugin repository.
+pvstack tracks Lauren Tan's pstack directly from Cursor's plugin repository.
 
 - Repository: https://github.com/cursor/plugins
 - Path: `pstack/`

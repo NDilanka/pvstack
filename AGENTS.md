@@ -1,4 +1,4 @@
-# PV Stack maintenance
+# pvstack maintenance
 
 - Don't hand-edit files listed in `plugins/pvstack/.upstream-files.json`. Change `tools/sync-upstream.mjs` (its `REWRITES` or the build steps) and re-run `npm run sync`, or send the change upstream to `cursor/plugins`.
 - `plugins/pvstack/droids/pv-*.md` are generated. Edit `CELLS` in `tools/droids.mjs`, then run `npm run droids`.

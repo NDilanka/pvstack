@@ -72,12 +72,12 @@ jobs:
 
           body="$RUNNER_TEMP/body.md"
           {
-            echo "Syncs PV Stack to upstream pstack ${version} (\`${sha}\`)."
+            echo "Syncs pvstack to upstream pstack ${version} (\`${sha}\`)."
             echo
             if [ "$status" -eq 0 ]; then
               echo "\`npm run check\` passes."
             else
-              echo "\`npm run check\` fails. Upstream likely added a role line, a model slug, or a Cursor reference that the PV Stack layer does not cover yet. Push a fix to \`${BRANCH}\` before merging; the workflow won't overwrite manual commits."
+              echo "\`npm run check\` fails. Upstream likely added a role line, a model slug, or a Cursor reference that the pvstack layer does not cover yet. Push a fix to \`${BRANCH}\` before merging; the workflow won't overwrite manual commits."
             fi
             echo
             echo '```text'
