@@ -34,6 +34,8 @@ const REWRITES = [
   ['"Comment Sicko"', '"comment-sicko"'],
   ["~/.cursor/skills/", "~/.factory/skills/"],
   [".cursor/skills/", ".factory/skills/"],
+  ["../../docs/guide/", "../../docs/upstream/guide/"],
+  ["[README](../../README.md)", "[README](../../docs/upstream/guide/README.md)"],
 ];
 
 // A skill that names any of these gets a pointer to the Droid mapping.

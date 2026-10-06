@@ -24,7 +24,7 @@ Before you move to the next step, go through that step's "Done when" list. Check
 
 On the greenfield line, do not start `gf-verify` until the app starts from one command. The verification generator needs an app it can launch.
 
-When the person is stuck, check the step's "Watch out" list, then the "Pitfalls" section. Offer a matching entry from the "Recipes" section.
+When the person is stuck, check the step's "Watch out" list, then the "Pitfalls" section. Offer a matching entry from the "Recipes" section. If none fits, or the person asks which skill fits a situation, suggest they type `/poteto-help` with their question. It answers and hands back a prompt without starting the work.
 
 Never tell the person that a step worked without proof, such as command output, an HTTP response, a screenshot, a video, or a measured number.
 
@@ -36,7 +36,7 @@ When you give advice, cite the step id or chapter id and its source, for example
 
 *The idea*
 
-pstack is a set of skills for AI coding agents. A skill is a folder of instructions that the agent reads when a task matches. Lauren Tan, known as poteto, wrote pstack and uses it to ship thousands of pull requests a month. PV Stack is the same skills packaged for Droid, with a model chosen for each kind of work.
+pstack is a set of skills for AI coding agents. A skill is a folder of instructions that the agent reads when you call it by name, or when another skill runs it. Lauren Tan, known as poteto, wrote pstack and uses it to ship thousands of pull requests a month. PV Stack is the same skills packaged for Droid, with a model chosen for each kind of work.
 
 The core idea is verification. The agent checks its own work in the real app, the way a person would. Then it can keep going until the task is done, and you stop being the bottleneck. poteto treats a good verification skill as critical infrastructure, not as one more skill.
 
@@ -82,7 +82,9 @@ To check that the install worked, start a new session. Type `/poteto-mode`, or `
 
 On Droid, run `/setup-pvstack` next. It asks you to pick a mode, Balanced or Budget, and writes a small file called the role sheet. The role sheet tells each skill which model to use for each job. On Cursor, the upstream version of this skill is `/setup-pstack`.
 
-Then start every real task with `/poteto-mode`. You don't pick a playbook. It reads your request and picks one. It stays on for the rest of the chat until you say to stop. If your tool can pin a mode so it applies on every turn, pin `/poteto-mode`.
+Then start every real task with `/poteto-mode`. You don't pick a playbook. It reads your request and picks one. Typing it applies the skill to that request. It may fade as the chat moves on, so type it again when you start the next task. On Cursor, a Custom Mode keeps it on every turn. The Cursor section under "Install on your tool" shows how.
+
+When you're stuck, or can't tell which skill fits, type `/poteto-help` with your question. It answers, hands you a prompt to send, and links the file the answer came from. It doesn't start the work, so nothing runs until you send that prompt.
 
 Go deeper:
 
@@ -106,11 +108,18 @@ Prompt: Run a small first task
 /poteto-mode add a --json flag to this command. text output stays byte-identical. verify both.
 ```
 
+Prompt: Ask which skill fits
+
+```text
+/poteto-help which skill should i use to review this branch?
+```
+
 Sources:
 
 - [guide/01-setup.md](https://github.com/NDilanka/pvstack/blob/main/plugins/pvstack/docs/upstream/guide/01-setup.md)
 - [skills/setup-pvstack](https://github.com/NDilanka/pvstack/blob/main/plugins/pvstack/skills/setup-pvstack/SKILL.md)
 - [skills/poteto-mode](https://github.com/NDilanka/pvstack/blob/main/plugins/pvstack/skills/poteto-mode/SKILL.md)
+- [skills/poteto-help](https://github.com/NDilanka/pvstack/blob/main/plugins/pvstack/skills/poteto-help/SKILL.md)
 
 ## Install on your tool
 
@@ -123,7 +132,7 @@ droid plugin marketplace add NDilanka/pvstack
 droid plugin install pvstack@pvstack --scope user
 ```
 
-- Run a skill: Type the skill as a slash command, for example `/poteto-mode`. Run `/setup-pvstack` once to pick a mode.
+- Run a skill: Type the skill as a slash command, for example `/poteto-mode`. Type it again at the start of each new task, because Droid has no Custom Mode to keep it on. Run `/setup-pvstack` once to pick a mode.
 - Parallel work: Subagents through the Task tool. Give each one its own git worktree.
 - Scheduled runs: Automations, or the Loop tool for a run that keeps going.
 - Docs: https://docs.factory.ai
@@ -147,7 +156,7 @@ Install:
 /add-plugin pstack
 ```
 
-- Run a skill: Type the skill as a slash command, for example `/poteto-mode`. Run `/setup-pstack` once to pick models. Install the `cursor-team-kit` plugin too, for `control-ui`, `control-cli`, and `deslop`.
+- Run a skill: Type the skill as a slash command, for example `/poteto-mode`. Pick it from the `/` menu with Option+Enter on Mac or Alt+Enter on Windows to make it a Custom Mode, which stays on every turn until you exit it. Run `/setup-pstack` once to pick models, then start a new chat, because its rule applies to new chats. Install the `cursor-team-kit` plugin too, for `control-ui`, `control-cli`, and `deslop`.
 - Parallel work: Cloud agents, or git worktrees.
 - Scheduled runs: Cursor Automations, or the `/loop` command for a run that keeps going.
 - Docs: https://github.com/cursor/plugins/tree/main/pstack
@@ -779,7 +788,7 @@ Go deeper:
 
 `/teach` runs `/how` and `/why`, then explains plainly. It starts with a short answer and adds layers when you ask. Part 2 notes that this research helps the agent too, because it makes the agent read the code before it states things.
 
-`/recall` mines your recent chats, the last 7 days by default, plus the shared record such as PRs, tickets, and errors still firing. It returns a short brief with a status tag on each thread and one next move.
+`/recall` mines your recent chats, the last 7 days by default, plus the shared record such as PRs, tickets, and errors still firing. It returns a short brief with a status tag on each thread and one next move. To resume one specific chat or branch instead, ask `/poteto-mode` to take over the branch, which runs the Session pickup playbook.
 
 Skills: [`/how`](https://github.com/NDilanka/pvstack/blob/main/plugins/pvstack/skills/how/SKILL.md), [`/why`](https://github.com/NDilanka/pvstack/blob/main/plugins/pvstack/skills/why/SKILL.md), [`/teach`](https://github.com/NDilanka/pvstack/blob/main/plugins/pvstack/skills/teach/SKILL.md), [`/recall`](https://github.com/NDilanka/pvstack/blob/main/plugins/pvstack/skills/recall/SKILL.md)
 
@@ -825,6 +834,7 @@ Sources:
 - [skills/why](https://github.com/NDilanka/pvstack/blob/main/plugins/pvstack/skills/why/SKILL.md)
 - [skills/teach](https://github.com/NDilanka/pvstack/blob/main/plugins/pvstack/skills/teach/SKILL.md)
 - [skills/recall](https://github.com/NDilanka/pvstack/blob/main/plugins/pvstack/skills/recall/SKILL.md)
+- [playbooks/session-pickup.md](https://github.com/NDilanka/pvstack/blob/main/plugins/pvstack/skills/poteto-mode/playbooks/session-pickup.md)
 
 ### bf-job: Pick the job and state its check
 
@@ -1265,6 +1275,7 @@ Sources:
 
 - [`/poteto-mode`](https://github.com/NDilanka/pvstack/blob/main/plugins/pvstack/skills/poteto-mode/SKILL.md): The front door. Describe the goal, and it picks a playbook and runs the other skills as the steps need them. When: Start almost every real task with it.
 - [`/setup-pvstack`](https://github.com/NDilanka/pvstack/blob/main/plugins/pvstack/skills/setup-pvstack/SKILL.md): Picks Balanced or Budget mode on Droid and writes the role sheet that maps each role to a model. Upstream pstack on Cursor has `/setup-pstack` instead. When: Once after you install PV Stack, and again to change a role.
+- [`/poteto-help`](https://github.com/NDilanka/pvstack/blob/main/plugins/pvstack/skills/poteto-help/SKILL.md): Answers a question about pstack, such as which skill fits or why a run went wrong, and hands you a prompt to send. It doesn't start the work. When: When you're stuck, or can't tell which skill, playbook, or principle fits.
 - [`/create-verification-skill`](https://github.com/NDilanka/pvstack/blob/main/plugins/pvstack/skills/create-verification-skill/SKILL.md): Studies your repo and writes a project-local `verify-<app>` skill that launches, drives, and proves your app, plus a Feature Map. When: As soon as your app starts from one command. Needs a running app.
 - [`/maintain-verification-skill`](https://github.com/NDilanka/pvstack/blob/main/plugins/pvstack/skills/maintain-verification-skill/SKILL.md): Drives every feature in the Feature Map and ships at most one PR of proven fixes to the verification skill. When: Daily, or whenever the app changed. Needs a running app.
 - [`/how`](https://github.com/NDilanka/pvstack/blob/main/plugins/pvstack/skills/how/SKILL.md): Explains how a subsystem works now, with parallel explorers for big questions. When: Before you change code you don't know.
@@ -1278,6 +1289,7 @@ Sources:
 - [`/swarm`](https://github.com/NDilanka/pvstack/blob/main/plugins/pvstack/skills/swarm/SKILL.md): Fans out workers across slices or races and returns one `PASS`, `ISSUES`, or `BLOCKED` report. When: Coverage across many parts, or many runs of the same check.
 - [`/interrogate`](https://github.com/NDilanka/pvstack/blob/main/plugins/pvstack/skills/interrogate/SKILL.md): Sends one diff to reviewers on different models and sorts their findings, without applying any. When: A contested design, or a branch you want challenged before shipping.
 - [`/tdd`](https://github.com/NDilanka/pvstack/blob/main/plugins/pvstack/skills/tdd/SKILL.md): Writes the smallest failing test first, then the fix, then reruns the test. When: A bug with a cheap local test path.
+- [`/typescript-best-practices`](https://github.com/NDilanka/pvstack/blob/main/plugins/pvstack/skills/typescript-best-practices/SKILL.md): Turns the type-system principles into concrete TypeScript rules, such as discriminated unions, `unknown` at boundaries, and exhaustive variants. When: Type it when a task touches `.ts` or `.tsx` files. It doesn't load on its own.
 - [`/blast-radius`](https://github.com/NDilanka/pvstack/blob/main/plugins/pvstack/skills/blast-radius/SKILL.md): Finds what a change could break outside the diff and proves the key safety fact by running code. When: A small diff you don't fully trust.
 - [`/benchmark-checklist`](https://github.com/NDilanka/pvstack/blob/main/plugins/pvstack/skills/benchmark-checklist/SKILL.md): Vets a measured number before you report or act on it. When: Any speedup or regression you measured.
 - [`/no-comments`](https://github.com/NDilanka/pvstack/blob/main/plugins/pvstack/skills/no-comments/SKILL.md): Hands the diff's comments to a fresh reviewer that removes all but a short keep list. When: Before review.
@@ -1327,7 +1339,7 @@ Line: any.
 /poteto-mode do it
 ```
 
-When the context is already rich, a short prompt is enough. The mode is sticky and the playbook holds the structure.
+When the context is already rich, a short prompt is enough. Typing `/poteto-mode` with it brings the mode back for this turn, and the playbook holds the structure.
 
 Sources:
 
@@ -1440,11 +1452,12 @@ Line: Brownfield.
 /recall the work i did yesterday on <topic> and then read this bug report on slack
 ```
 
-Past chats hold context that a fresh agent would otherwise rebuild from scratch.
+Past chats hold context that a fresh agent would otherwise rebuild from scratch. To resume one specific chat or branch, the Session pickup playbook fits better.
 
 Sources:
 
 - [Part 2: Research, planning, prototyping, and architecture](https://x.com/poteto/status/2097732320606507506)
+- [playbooks/session-pickup.md](https://github.com/NDilanka/pvstack/blob/main/plugins/pvstack/skills/poteto-mode/playbooks/session-pickup.md)
 
 ### Design a package by writing its tutorial
 
@@ -1732,6 +1745,21 @@ Sources:
 
 - [guide/10-recipes-and-pitfalls.md](https://github.com/NDilanka/pvstack/blob/main/plugins/pvstack/docs/upstream/guide/10-recipes-and-pitfalls.md)
 
+### Ask how without starting the work
+
+Line: any.
+
+```text
+/poteto-help how do i keep poteto-mode on for a whole task?
+```
+
+You get an answer, a prompt to send, and a link to the source. Nothing runs until you send that prompt.
+
+Sources:
+
+- [guide/10-recipes-and-pitfalls.md](https://github.com/NDilanka/pvstack/blob/main/plugins/pvstack/docs/upstream/guide/10-recipes-and-pitfalls.md)
+- [skills/poteto-help](https://github.com/NDilanka/pvstack/blob/main/plugins/pvstack/skills/poteto-help/SKILL.md)
+
 ### Capture a lesson after a hard task
 
 Line: any.
@@ -1759,11 +1787,15 @@ Sources:
 - Don't: Accept the agent's first design. Do: Ask for prototypes, or run `/architect`, which compares at least two designs before it builds. ([Part 2: Research, planning, prototyping, and architecture](https://x.com/poteto/status/2097732320606507506))
 - Don't: Overcook the plan before you have evidence. Do: Answer open questions with prototypes and real runs. Then turn the settled design into a plan. ([Part 2: Research, planning, prototyping, and architecture](https://x.com/poteto/status/2097732320606507506))
 - Don't: Skip verification setup and check every change by hand. Do: Run `/create-verification-skill` as soon as the app starts, so agents can prove their own work. ([Part 1: Verification is all you need](https://x.com/poteto/status/2094457600259842065), [skills/create-verification-skill](https://github.com/NDilanka/pvstack/blob/main/plugins/pvstack/skills/create-verification-skill/SKILL.md))
+- Don't: Expect `/poteto-mode` to stay on for the whole chat after you type it once. Do: Type `/poteto-mode` at the start of each new task. On Cursor, start it as a Custom Mode with Option+Enter or Alt+Enter, and it stays on every turn until you exit it. ([skills/poteto-help](https://github.com/NDilanka/pvstack/blob/main/plugins/pvstack/skills/poteto-help/SKILL.md), [guide/01-setup.md](https://github.com/NDilanka/pvstack/blob/main/plugins/pvstack/docs/upstream/guide/01-setup.md))
+- Don't: Ask a new question mid-chat and expect the mode to treat it as new. Do: Say `new task` first, so `/poteto-mode` picks a fresh playbook. Add "don't change any code yet" when you only want an answer. ([guide/02-poteto-mode.md](https://github.com/NDilanka/pvstack/blob/main/plugins/pvstack/docs/upstream/guide/02-poteto-mode.md), [skills/poteto-help](https://github.com/NDilanka/pvstack/blob/main/plugins/pvstack/skills/poteto-help/SKILL.md))
+- Don't: Wait for a skill to load on its own because the task matches it. Do: Type the skill's name, or let `/poteto-mode` run it as a step. `/poteto-mode` doesn't run every skill, so name one such as `/typescript-best-practices` when you want it. Ask `/poteto-help` when you can't tell which one fits. ([skills/poteto-help](https://github.com/NDilanka/pvstack/blob/main/plugins/pvstack/skills/poteto-help/SKILL.md), [guide/05-build-and-clean.md](https://github.com/NDilanka/pvstack/blob/main/plugins/pvstack/docs/upstream/guide/05-build-and-clean.md))
+- Don't: Run every small, obvious edit through `/poteto-mode`. Do: Save `/poteto-mode` for work that needs rigor. To spend fewer tokens, rerun `/setup-pvstack` and pick Budget mode, set a role to `inherit` so it runs on the chat's model, or shorten a panel list, because each entry runs one subagent. ([skills/poteto-help](https://github.com/NDilanka/pvstack/blob/main/plugins/pvstack/skills/poteto-help/SKILL.md), [skills/setup-pvstack](https://github.com/NDilanka/pvstack/blob/main/plugins/pvstack/skills/setup-pvstack/SKILL.md), [guide/01-setup.md](https://github.com/NDilanka/pvstack/blob/main/plugins/pvstack/docs/upstream/guide/01-setup.md))
 
 ## Glossary
 
 - **Agent**: An AI model that can read files, run commands, and edit code to finish a task.
-- **Skill**: A folder of instructions, with a `SKILL.md` file, that your agent loads when the task matches or when you call it by name.
+- **Skill**: A folder of instructions, with a `SKILL.md` file, that your agent loads when you call it by name, or when another skill such as `/poteto-mode` runs it.
 - **Slash command**: A skill called by typing `/` and its name, such as `/poteto-mode`. Codex uses `$` instead.
 - **Playbook**: A step-by-step workflow inside `poteto-mode`, such as Bug fix or Feature. The agent picks one for you. It is not a separate skill.
 - **Principle**: One of 24 short rules, such as Prove It Works. Say a principle's name to steer the agent mid-task.
@@ -1786,7 +1818,7 @@ Sources:
 - **PR stack**: A chain of small PRs where each one builds on the one below it. You land them from the bottom up.
 - **Role sheet**: The file `~/.factory/pvstack-models.md`. It maps each kind of work, such as code or review, to a droid with a fixed model. `/setup-pvstack` writes it.
 - **Droid**: Factory's coding agent. In PV Stack, a droid named `pv-*` is also a preset agent with one fixed model and effort level.
-- **Sticky mode**: `/poteto-mode` stays on for the rest of the chat after you call it, until you say to stop.
+- **Custom Mode**: A Cursor feature that keeps a skill such as `/poteto-mode` on every turn until you exit it. Pick the skill from the `/` menu with Option+Enter on Mac or Alt+Enter on Windows. Without one, typing `/poteto-mode` applies it to one request, and it may fade as the chat moves on.
 
 ## Model routing
 

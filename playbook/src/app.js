@@ -36,7 +36,6 @@
   function setMode(m) {
     if (!MODES.includes(m) || m === mode) return;
     mode = m;
-    root.dataset.lineMode = m;
     for (const el of $$("[data-line]")) el.hidden = el.dataset.line !== m;
     for (const b of $$("[data-mode-btn]")) b.setAttribute("aria-pressed", String(b.dataset.modeBtn === m));
     for (const a of $$(`[data-href-${m}]`)) {
@@ -138,11 +137,11 @@
     const ok = await copyText(text);
     const label = $("span", b);
     if (!b.dataset.label) b.dataset.label = label.textContent;
-    b.classList.toggle("done", ok);
+    b.classList.toggle("copied", ok);
     label.textContent = ok ? "Copied" : "Copy failed";
     announce(ok ? "Copied to clipboard" : "Copy failed. Select the text instead.");
     clearTimeout(b.timer);
-    b.timer = setTimeout(() => { b.classList.remove("done"); label.textContent = b.dataset.label; }, 1800);
+    b.timer = setTimeout(() => { b.classList.remove("copied"); label.textContent = b.dataset.label; }, 1800);
   });
 
   const stationLinks = (id) => $$(`[data-station="${id}"]`);
@@ -190,9 +189,8 @@
       if (a.dataset.toc === best) a.setAttribute("aria-current", "location");
       else a.removeAttribute("aria-current");
     }
-    for (const el of $$(".station.current, .here[data-station]")) el.classList.remove("current", "here");
+    for (const el of $$(".here[data-station]")) el.classList.remove("here");
     if (best && stepMode.has(best)) {
-      document.getElementById(best).classList.add("current");
       for (const a of stationLinks(best)) if (!a.closest(".toc")) a.classList.add("here");
     }
     const cur = $(`.toc a[data-toc="${best}"]`);
