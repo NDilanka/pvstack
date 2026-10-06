@@ -184,7 +184,6 @@ const ICON = {
   theme: '<svg aria-hidden="true" viewBox="0 0 16 16" width="16" height="16"><circle cx="8" cy="8" r="6" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M8 2a6 6 0 0 1 0 12z" fill="currentColor"/></svg>',
   menu: '<svg aria-hidden="true" viewBox="0 0 16 16" width="16" height="16"><path d="M2 4h12M2 8h12M2 12h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>',
   close: '<svg aria-hidden="true" viewBox="0 0 16 16" width="16" height="16"><path d="M3.5 3.5l9 9M12.5 3.5l-9 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>',
-  repeat: '<svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18"><path d="M4 12a8 8 0 0 1 14-5.3M20 12a8 8 0 0 1-14 5.3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M18 3v4h-4M6 21v-4h4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>',
 };
 
 // Line colors arrive as one hex per line. Each theme gets a variant that passes WCAG AA (4.5:1) as
@@ -447,7 +446,7 @@ function agentsHtml(C) {
 
 function loopHtml(C, standalone) {
   const steps = C.loop.map((c, i) => `<li><span class="loop-n" aria-hidden="true">${i + 1}</span><h3>${inline(c.title)}</h3><p>${inline(c.plain)}</p></li>`).join("");
-  const figure = `<figure class="loop" aria-labelledby="loop-cap"><figcaption id="loop-cap">The core loop</figcaption><ol class="loop-steps">${steps}</ol><p class="loop-repeat">${ICON.repeat}<span>Then repeat from step 1</span></p></figure>`;
+  const figure = `<figure class="loop" aria-labelledby="loop-cap"><figcaption id="loop-cap">The core loop</figcaption><ol class="loop-steps">${steps}</ol><p class="loop-repeat">Then repeat from step 1.</p></figure>`;
   if (!standalone) return figure;
   return `<section id="loop" aria-label="The core loop">${figure}</section>`;
 }
@@ -601,7 +600,7 @@ function tocHtml(C, M) {
           ? `<li><a href="#${it.id}" data-toc="${it.id}" data-station="${it.id}"${it.shared ? ' class="is-shared"' : ""}><span class="toc-n" aria-hidden="true">${it.n}</span>${inline(it.label)}</a></li>`
           : `<li><a href="#${it.id}" data-toc="${it.id}">${inline(it.label)}</a></li>`))
         .join("");
-      return `<li${g.mode ? ` class="toc-line" data-mode="${g.mode}" style="--c:${lineVar(g.mode)}"` : ""}>${head}<ol>${items}</ol></li>`;
+      return `<li${g.mode ? ` style="--c:${lineVar(g.mode)}"` : ""}>${head}<ol>${items}</ol></li>`;
     })
     .join("");
   return `<nav class="toc" id="toc" aria-label="Contents"><ol>${groups}</ol></nav>`;
@@ -613,7 +612,7 @@ function toolsHtml(C, where) {
 }
 
 function templatesHtml(C) {
-  return C.platforms.map((p) => `<template data-pf-template="${p.id}" data-name="${esc(p.name)}">${inline(p.invoke)}</template>`).join("");
+  return C.platforms.map((p) => `<template data-pf-template="${p.id}">${inline(p.invoke)}</template>`).join("");
 }
 
 function guardInline(text, tag) {
