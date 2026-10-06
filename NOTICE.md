@@ -1,12 +1,12 @@
 # Notice
 
-PV Stack includes and modifies pstack by Lauren Tan ([@poteto](https://github.com/poteto)), from https://github.com/cursor/plugins/tree/main/pstack, under the MIT License. The original license is in `plugins/pvstack/LICENSE-pstack`.
+pvstack includes and modifies pstack by Lauren Tan ([@poteto](https://github.com/poteto)), from https://github.com/cursor/plugins/tree/main/pstack, under the MIT License. The original license is in `plugins/pvstack/LICENSE-pstack`.
 
 ## Files from pstack
 
 These files are listed in `plugins/pvstack/.upstream-files.json`:
 
-- `plugins/pvstack/skills/**` (except the PV Stack files below)
+- `plugins/pvstack/skills/**` (except the pvstack files below)
 - `plugins/pvstack/droids/poteto-agent.md`, `plugins/pvstack/droids/comment-sicko.md`
 - `plugins/pvstack/docs/upstream/**`
 
@@ -17,7 +17,7 @@ These files are listed in `plugins/pvstack/.upstream-files.json`:
 - Cursor agents are converted to Droid droids: the name is normalized, `model: inherit` is added, and Cursor-only keys are removed.
 - `setup-pstack` and the Benny automation pack are not included.
 
-## Files written for PV Stack
+## Files written for pvstack
 
 - `plugins/pvstack/droids/pv-*.md`
 - `plugins/pvstack/skills/setup-pvstack/**`

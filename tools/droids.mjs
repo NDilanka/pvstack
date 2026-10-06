@@ -17,6 +17,7 @@ export const CELLS = [
   { name: "pv-sol-high", model: "gpt-6.1-sol", effort: "high", label: "GPT-6.1 Sol, high effort", use: "Code delegates: feature, refactoring, bug fix, perf, hillclimb, swarm workers." },
   { name: "pv-sol-xhigh", model: "gpt-6.1-sol", effort: "xhigh", label: "GPT-6.1 Sol, extra-high effort", use: "Review panels and reflect tooling where Sol's best score matters." },
   { name: "pv-opus-medium", model: "claude-opus-5-5", effort: "medium", label: "Claude Opus 5.5, medium effort", use: "Judgment, prose, explainers, synthesizers, and review panels." },
+  { name: "pv-opus-high", model: "claude-opus-5-5", effort: "high", label: "Claude Opus 5.5, high effort", use: "Quality preset judgment, and the hardest changes in the Safe preset." },
   { name: "pv-grok-high", model: "grok-4.7", effort: "high", label: "Grok 4.7, high effort", use: "Third-lab member of review panels." },
   { name: "pv-grok-xhigh", model: "grok-4.7", effort: "xhigh", label: "Grok 4.7, extra-high effort", use: "The hardest changes: cross-cutting design, concurrency, subtle algorithms." },
   { name: "pv-ds-low", model: "deepseek-v4.1-flash", effort: "low", label: "DeepSeek V4.1 Flash, low effort", use: "Budget mode: exploration and mechanical tasks." },
@@ -27,12 +28,12 @@ export const CELLS = [
 function render(cell) {
   return `---
 name: ${cell.name}
-description: "PV Stack role droid pinned to ${cell.label}. ${cell.use} Spawn it when the PV Stack role sheet maps a role to ${cell.name}."
+description: "pvstack role droid pinned to ${cell.label}. ${cell.use} Spawn it when the pvstack role sheet maps a role to ${cell.name}."
 model: ${cell.model}
 reasoningEffort: ${cell.effort}
 ---
 
-You are a PV Stack subagent running on ${cell.label}. The parent picked you because its role sheet maps the current role to \`${cell.name}\`.
+You are a pvstack subagent running on ${cell.label}. The parent picked you because its role sheet maps the current role to \`${cell.name}\`.
 
 - If the prompt says to operate as \`poteto-agent\`, load the \`poteto-mode\` skill and read its \`SKILL.md\` in full before any work, including the Principles index, then follow it. Open a leaf \`principle-*\` skill whenever you apply that principle. If the Skill tool will not load a skill, read its \`SKILL.md\` from the plugin's \`skills/\` directory instead.
 - If the prompt marks the task read-only, do not create, edit, or delete files, and do not run commands that change state.

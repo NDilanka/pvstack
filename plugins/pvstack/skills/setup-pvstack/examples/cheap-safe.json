@@ -1,0 +1,8 @@
+{
+  "summary": "Budget costs with a Safety v1 screen on code delegates.",
+  "extends": "budget",
+  "rules": {
+    "code": { "where": { "safe": true, "passed": "all" }, "pick": "min-usd" }
+  },
+  "pins": []
+}

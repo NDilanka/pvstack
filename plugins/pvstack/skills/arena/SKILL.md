@@ -5,7 +5,7 @@ disable-model-invocation: true
 ---
 
 <!-- pvstack:droid-note -->
-> **PV Stack on Droid.** Before following this skill, read [droid-tools.md](../poteto-mode/references/droid-tools.md). It maps the Cursor tools, Task parameters, and model slugs named below to Droid tools and `pv-*` droids, and says where the role sheet lives.
+> **pvstack on Droid.** Before following this skill, read [droid-tools.md](../poteto-mode/references/droid-tools.md). It maps the Cursor tools, Task parameters, and model slugs named below to Droid tools and `pv-*` droids, and says where the role sheet lives.
 
 # Arena
 

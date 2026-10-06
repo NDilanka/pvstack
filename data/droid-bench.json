@@ -1,0 +1,77 @@
+{
+  "suite": "VulcanBench Python Suite v1 (python-1)",
+  "harness": "droid exec --auto high",
+  "metric": "hidden-test resolution, functional only",
+  "cells": {
+    "pv-ds-high": {
+      "runs": 69,
+      "infraFailures": 1,
+      "resolvedRate": 0.8676,
+      "resolvedRateRange": [
+        0.8261,
+        0.9091
+      ],
+      "functional": 0.9555,
+      "medianMinutes": 1.21,
+      "medianCredits": 14271.5,
+      "tasks": 23,
+      "repeats": 3
+    },
+    "pv-ds-low": {
+      "runs": 69,
+      "infraFailures": 0,
+      "resolvedRate": 0.8551,
+      "resolvedRateRange": [
+        0.7826,
+        0.913
+      ],
+      "functional": 0.9504,
+      "medianMinutes": 1,
+      "medianCredits": 11558,
+      "tasks": 23,
+      "repeats": 3
+    },
+    "pv-ds-max": {
+      "runs": 69,
+      "infraFailures": 3,
+      "resolvedRate": 0.8485,
+      "resolvedRateRange": [
+        0.8261,
+        0.8636
+      ],
+      "functional": 0.9458,
+      "medianMinutes": 2.34,
+      "medianCredits": 32796.5,
+      "tasks": 23,
+      "repeats": 3
+    },
+    "pv-sol-high": {
+      "runs": 69,
+      "infraFailures": 0,
+      "resolvedRate": 0.8696,
+      "resolvedRateRange": [
+        0.8696,
+        0.8696
+      ],
+      "functional": 0.9385,
+      "medianMinutes": 1.51,
+      "medianCredits": 46092,
+      "tasks": 23,
+      "repeats": 3
+    },
+    "pv-sol-low": {
+      "runs": 69,
+      "infraFailures": 0,
+      "resolvedRate": 0.8696,
+      "resolvedRateRange": [
+        0.8696,
+        0.8696
+      ],
+      "functional": 0.9361,
+      "medianMinutes": 0.84,
+      "medianCredits": 26368,
+      "tasks": 23,
+      "repeats": 3
+    }
+  }
+}

@@ -1,6 +1,6 @@
-# PV Stack on Droid: tool and model mapping
+# pvstack on Droid: tool and model mapping
 
-pstack's skills are written for Cursor. PV Stack keeps them close to upstream and resolves every Cursor-specific term here. When a skill and this file disagree about a tool, parameter, or model, this file wins.
+pstack's skills are written for Cursor. pvstack keeps them close to upstream and resolves every Cursor-specific term here. When a skill and this file disagree about a tool, parameter, or model, this file wins.
 
 ## Models: the role sheet
 
@@ -11,7 +11,7 @@ pstack names a role line ("the `how explorer` line", "the `interrogate reviewers
 3. Spawn that droid by passing the name as the Task tool's `subagent_type`. Droid's Task tool has no `model` parameter. Each `pv-*` droid has a fixed model and reasoning effort.
 4. Ignore every Cursor default slug in the skills (`claude-opus-5-5-max`, `gpt-5.6-sol-max`, `grok-4.7-xhigh-fast`, and their variants). They are not Droid model IDs. A role that has no line in the sheet uses the Balanced sheet's line.
 5. If the value is `inherit`, `inherit-parent`, or `auto`, use the built-in `worker` droid. It runs on the parent model.
-6. If the value names a `pv-*` droid that no longer exists (a plugin update retired it), use the line for that role in `../../setup-pvstack/modes/<mode>.md`, where `<mode>` comes from the sheet's `# mode:` line. Tell the user once to re-run `/setup-pvstack`.
+6. If the value names a `pv-*` droid that no longer exists (a plugin update retired it), use the line for that role in `../../setup-pvstack/modes/<mode>.md`, where `<mode>` comes from the sheet's `# mode:` line. When the mode line is `custom:<name>`, there is no modes file for it: use the sheet's `# extends:` base instead. Tell the user once to re-run `/setup-pvstack`.
 7. If Droid rejects a droid for any other reason (blocked by org model policy, for example), use `worker` and tell the user which role fell back.
 
 Panels: one subagent per list entry, with the same prompt for each. The list length sets the panel size. For `arena cross-judge pool`, pick one entry from a different model family than the parent session when you can.
@@ -47,7 +47,7 @@ Subagents on Droid cannot spawn their own subagents or ask the user questions. A
 | `AskQuestion` (rewritten to `AskUser` during sync) | `AskUser`. Explain the options in plain words before the call. |
 | Cursor Custom Mode (Option+Enter / Alt+Enter, or Use as Mode) | Droid has no Custom Mode. Typing `/poteto-mode` applies it to that request. Start each new task with `/poteto-mode`. |
 | "The rule from `/setup-pvstack` applies to new chats" / "start a new chat" after setup | The role sheet is read the next time a skill spawns a subagent. No new chat needed. |
-| "Only `/setup-pvstack` loads from the user's words" | No PV Stack skill loads on its own. Type the skill's name, or let `/poteto-mode` run it. |
+| "Only `/setup-pvstack` loads from the user's words" | No pvstack skill loads on its own. Type the skill's name, or let `/poteto-mode` run it. |
 | `/loop` | The `Loop` tool (load it with ToolSearch `select:Loop`). For an overnight or hourly tick, use `Loop` or a scheduled automation (`CreateAutomation`). |
 | Cursor plan mode / `CreatePlan` | Droid spec mode (`ExitSpecMode` presents the plan). |
 | `cursor-team-kit` `/deslop` | The built-in `simplify` skill. |

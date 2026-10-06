@@ -5,7 +5,11 @@
   "scripts": {
     "sync": "node tools/sync-upstream.mjs",
     "droids": "node tools/droids.mjs",
+    "vulcanbench": "node tools/vulcanbench.mjs",
+    "presets": "node tools/presets.mjs",
+    "evidence": "node tools/evidence.mjs",
     "playbook": "node tools/playbook.mjs",
-    "check": "node tools/sync-upstream.mjs --check && node tools/droids.mjs --check && node tools/validate.mjs && node tools/playbook.mjs --check"
+    "check": "node tools/sync-upstream.mjs --check && node tools/droids.mjs --check && node tools/validate.mjs && node tools/presets.mjs --check && node tools/droid-bench.mjs check && node tools/evidence.mjs --check && node tools/playbook.mjs --check && node tools/vulcanbench.mjs --check-fresh",
+    "droid-bench": "node tools/droid-bench.mjs"
   }
 }
