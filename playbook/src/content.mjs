@@ -49,7 +49,7 @@ export const agentBrief = [
   "Copy a prompt from the step's \"Prompt\" blocks for the person. Replace every <placeholder> with their real app, feature, bug, or file before they send it.",
   "Before you move to the next step, go through that step's \"Done when\" list. Check each item yourself when you can. Otherwise ask the person to confirm it.",
   "On the greenfield line, do not start `gf-verify` until the app starts from one command. The verification generator needs an app it can launch.",
-  "When the person is stuck, check the step's \"Watch out\" list, then the \"Pitfalls\" section. Offer a matching entry from the \"Recipes\" section.",
+  "When the person is stuck, check the step's \"Watch out\" list, then the \"Pitfalls\" section. Offer a matching entry from the \"Recipes\" section. If none fits, or the person asks which skill fits a situation, suggest they type `/poteto-help` with their question. It answers and hands back a prompt without starting the work.",
   "Never tell the person that a step worked without proof, such as command output, an HTTP response, a screenshot, a video, or a measured number.",
   "Explain a term from the \"Glossary\" section the first time you use it. Keep your sentences short and plain.",
   "When you give advice, cite the step id or chapter id and its source, for example `gf-plan` and `playbooks/multi-phase-plan.md`.",
@@ -61,7 +61,7 @@ export const platforms = [
     id: "droid",
     name: "Droid",
     install: ["droid plugin marketplace add NDilanka/pvstack", "droid plugin install pvstack@pvstack --scope user"],
-    invoke: "Type the skill as a slash command, for example `/poteto-mode`. Run `/setup-pvstack` once to pick a mode.",
+    invoke: "Type the skill as a slash command, for example `/poteto-mode`. Type it again at the start of each new task, because Droid has no Custom Mode to keep it on. Run `/setup-pvstack` once to pick a mode.",
     parallel: "Subagents through the Task tool. Give each one its own git worktree.",
     schedule: "Automations, or the Loop tool for a run that keeps going.",
     verified: true,
@@ -83,7 +83,7 @@ export const platforms = [
     id: "cursor",
     name: "Cursor",
     install: ["/add-plugin pstack"],
-    invoke: "Type the skill as a slash command, for example `/poteto-mode`. Run `/setup-pstack` once to pick models. Install the `cursor-team-kit` plugin too, for `control-ui`, `control-cli`, and `deslop`.",
+    invoke: "Type the skill as a slash command, for example `/poteto-mode`. Pick it from the `/` menu with Option+Enter on Mac or Alt+Enter on Windows to make it a Custom Mode, which stays on every turn until you exit it. Run `/setup-pstack` once to pick models, then start a new chat, because its rule applies to new chats. Install the `cursor-team-kit` plugin too, for `control-ui`, `control-cli`, and `deslop`.",
     parallel: "Cloud agents, or git worktrees.",
     schedule: "Cursor Automations, or the `/loop` command for a run that keeps going.",
     verified: true,
@@ -131,7 +131,7 @@ export const chapters = [
     kicker: "The idea",
     title: "pstack in 60 seconds",
     plain: [
-      "pstack is a set of skills for AI coding agents. A skill is a folder of instructions that the agent reads when a task matches. Lauren Tan, known as poteto, wrote pstack and uses it to ship thousands of pull requests a month. PV Stack is the same skills packaged for Droid, with a model chosen for each kind of work.",
+      "pstack is a set of skills for AI coding agents. A skill is a folder of instructions that the agent reads when you call it by name, or when another skill runs it. Lauren Tan, known as poteto, wrote pstack and uses it to ship thousands of pull requests a month. PV Stack is the same skills packaged for Droid, with a model chosen for each kind of work.",
       "The core idea is verification. The agent checks its own work in the real app, the way a person would. Then it can keep going until the task is done, and you stop being the bottleneck. poteto treats a good verification skill as critical infrastructure, not as one more skill.",
       "Every task follows one loop. You say the goal. The agent makes a small change. It drives the real app to check the change. It hands you proof, such as a video, a screenshot, command output, or a number.",
       "The one habit to learn is to say what you want and how to check it. You don't list steps or skills. `/poteto-mode` picks the workflow for you.",
@@ -154,7 +154,8 @@ export const chapters = [
       "Install the skills for your agent tool. The platform table lists the steps for Droid, Claude Code, Cursor, Codex, and other tools. On Droid, PV Stack installs with two commands.",
       "To check that the install worked, start a new session. Type `/poteto-mode`, or `$poteto-mode` on Codex, and see the skill load. You can also ask the agent to list its skills and look for `poteto-mode` in the list.",
       "On Droid, run `/setup-pvstack` next. It asks you to pick a mode, Balanced or Budget, and writes a small file called the role sheet. The role sheet tells each skill which model to use for each job. On Cursor, the upstream version of this skill is `/setup-pstack`.",
-      "Then start every real task with `/poteto-mode`. You don't pick a playbook. It reads your request and picks one. It stays on for the rest of the chat until you say to stop. If your tool can pin a mode so it applies on every turn, pin `/poteto-mode`.",
+      "Then start every real task with `/poteto-mode`. You don't pick a playbook. It reads your request and picks one. Typing it applies the skill to that request. It may fade as the chat moves on, so type it again when you start the next task. On Cursor, a Custom Mode keeps it on every turn. The Cursor section under \"Install on your tool\" shows how.",
+      "When you're stuck, or can't tell which skill fits, type `/poteto-help` with your question. It answers, hands you a prompt to send, and links the file the answer came from. It doesn't start the work, so nothing runs until you send that prompt.",
     ],
     deeper: [
       "The role sheet lives at `~/.factory/pvstack-models.md`. Without it, PV Stack uses the Balanced sheet. Skills read the sheet the next time they spawn a subagent, so you don't need to restart. At the end, `/setup-pvstack` checks whether the project can already prove app behavior. If it can't, it offers once to run `/create-verification-skill`.",
@@ -165,8 +166,9 @@ export const chapters = [
     prompts: [
       { intent: "Pick a mode and write the role sheet (Droid)", text: "/setup-pvstack" },
       { intent: "Run a small first task", text: "/poteto-mode add a --json flag to this command. text output stays byte-identical. verify both." },
+      { intent: "Ask which skill fits", text: "/poteto-help which skill should i use to review this branch?" },
     ],
-    sources: ["guide/01-setup.md", "skills/setup-pvstack", "skills/poteto-mode"],
+    sources: ["guide/01-setup.md", "skills/setup-pvstack", "skills/poteto-mode", "skills/poteto-help"],
   },
   {
     id: "habit",
@@ -616,7 +618,7 @@ export const lines = {
           "`/how` sizes the question first. For a narrow question, one agent reads and explains. For a subsystem that spans many files or services, two to four read-only explorers run in parallel, and then a separate agent writes the explanation.",
           "`/why` starts from source control. Then it queries every evidence source your tools can reach, such as the issue tracker, docs, team chat, monitoring, error tracking, and analytics. It separates what it found from what it infers, and it reports a null result as a finding.",
           "`/teach` runs `/how` and `/why`, then explains plainly. It starts with a short answer and adds layers when you ask. Part 2 notes that this research helps the agent too, because it makes the agent read the code before it states things.",
-          "`/recall` mines your recent chats, the last 7 days by default, plus the shared record such as PRs, tickets, and errors still firing. It returns a short brief with a status tag on each thread and one next move.",
+          "`/recall` mines your recent chats, the last 7 days by default, plus the shared record such as PRs, tickets, and errors still firing. It returns a short brief with a status tag on each thread and one next move. To resume one specific chat or branch instead, ask `/poteto-mode` to take over the branch, which runs the Session pickup playbook.",
         ],
         skills: ["how", "why", "teach", "recall"],
         prompts: [
@@ -631,7 +633,7 @@ export const lines = {
           "The explanation cites files, commits, or tickets, not only the agent's word.",
         ],
         pitfalls: ["Don't skip this because the agent will read the code anyway. One `/how` costs less than a second bug."],
-        sources: ["p2", "guide/03-understand.md", "skills/how", "skills/why", "skills/teach", "skills/recall"],
+        sources: ["p2", "guide/03-understand.md", "skills/how", "skills/why", "skills/teach", "skills/recall", "playbooks/session-pickup.md"],
       },
       {
         id: "bf-job",
@@ -797,6 +799,7 @@ export const sharedStations = [{ id: "verify", station: "Verify" }, { id: "ship"
 export const skills = [
   { id: "poteto-mode", oneLine: "The front door. Describe the goal, and it picks a playbook and runs the other skills as the steps need them.", trigger: "Start almost every real task with it.", needsRunningApp: false },
   { id: "setup-pvstack", oneLine: "Picks Balanced or Budget mode on Droid and writes the role sheet that maps each role to a model. Upstream pstack on Cursor has `/setup-pstack` instead.", trigger: "Once after you install PV Stack, and again to change a role.", needsRunningApp: false },
+  { id: "poteto-help", oneLine: "Answers a question about pstack, such as which skill fits or why a run went wrong, and hands you a prompt to send. It doesn't start the work.", trigger: "When you're stuck, or can't tell which skill, playbook, or principle fits.", needsRunningApp: false },
   { id: "create-verification-skill", oneLine: "Studies your repo and writes a project-local `verify-<app>` skill that launches, drives, and proves your app, plus a Feature Map.", trigger: "As soon as your app starts from one command.", needsRunningApp: true },
   { id: "maintain-verification-skill", oneLine: "Drives every feature in the Feature Map and ships at most one PR of proven fixes to the verification skill.", trigger: "Daily, or whenever the app changed.", needsRunningApp: true },
   { id: "how", oneLine: "Explains how a subsystem works now, with parallel explorers for big questions.", trigger: "Before you change code you don't know.", needsRunningApp: false },
@@ -810,6 +813,7 @@ export const skills = [
   { id: "swarm", oneLine: "Fans out workers across slices or races and returns one `PASS`, `ISSUES`, or `BLOCKED` report.", trigger: "Coverage across many parts, or many runs of the same check.", needsRunningApp: false },
   { id: "interrogate", oneLine: "Sends one diff to reviewers on different models and sorts their findings, without applying any.", trigger: "A contested design, or a branch you want challenged before shipping.", needsRunningApp: false },
   { id: "tdd", oneLine: "Writes the smallest failing test first, then the fix, then reruns the test.", trigger: "A bug with a cheap local test path.", needsRunningApp: false },
+  { id: "typescript-best-practices", oneLine: "Turns the type-system principles into concrete TypeScript rules, such as discriminated unions, `unknown` at boundaries, and exhaustive variants.", trigger: "Type it when a task touches `.ts` or `.tsx` files. It doesn't load on its own.", needsRunningApp: false },
   { id: "blast-radius", oneLine: "Finds what a change could break outside the diff and proves the key safety fact by running code.", trigger: "A small diff you don't fully trust.", needsRunningApp: false },
   { id: "benchmark-checklist", oneLine: "Vets a measured number before you report or act on it.", trigger: "Any speedup or regression you measured.", needsRunningApp: false },
   { id: "no-comments", oneLine: "Hands the diff's comments to a fresh reviewer that removes all but a short keep list.", trigger: "Before review.", needsRunningApp: false },
@@ -853,7 +857,7 @@ export const principles = [
 
 /** @type {{ id: string, title: string, mode: Mode | 'any', prompt: string, why: string, sources: SourceRef[] }[]} */
 export const recipes = [
-  { id: "do-it", title: "The thread already says enough", mode: "any", prompt: "/poteto-mode do it", why: "When the context is already rich, a short prompt is enough. The mode is sticky and the playbook holds the structure.", sources: ["p2", "guide/02-poteto-mode.md"] },
+  { id: "do-it", title: "The thread already says enough", mode: "any", prompt: "/poteto-mode do it", why: "When the context is already rich, a short prompt is enough. Typing `/poteto-mode` with it brings the mode back for this turn, and the playbook holds the structure.", sources: ["p2", "guide/02-poteto-mode.md"] },
   { id: "restate", title: "Restate a report in plain English", mode: "brownfield", prompt: "/poteto-mode read this slack thread. restate in your own words and in plain english what you think the underlying issue is", why: "You catch a misunderstanding before any code exists, and your own guesses don't steer the agent.", sources: ["p2"] },
   { id: "first-bug", title: "Fix a bug with a goal and a check", mode: "brownfield", prompt: "/poteto-mode the export writes duplicate rows when a retry lands mid-run. repro first, then fix and verify.", why: "\"repro first\" and a checkable outcome are all the routing signal `/poteto-mode` needs.", sources: ["guide/README.md"] },
   { id: "repro-video", title: "Reproduce a report and prove the fix", mode: "brownfield", prompt: "/poteto-mode repro this with /verify-<app>. if it repros on main, fix it and show me a video as proof", why: "It checks the bug still exists on main before fixing, and the video is the proof. For an app with no screen, ask for command output or HTTP responses instead.", sources: ["p2"] },
@@ -861,7 +865,7 @@ export const recipes = [
   { id: "investigate", title: "Research an ambiguous bug", mode: "brownfield", prompt: "/poteto-mode investigate why <background workers periodically fail with timeout errors>. give me a breakdown of what we know, what data you used, and your best hypotheses.", why: "The agent explores code, metrics, and history in parallel and separates evidence from guesses.", sources: ["p2"] },
   { id: "how-then-why", title: "Understand an unfamiliar subsystem", mode: "brownfield", prompt: "use /how first to understand how this initialization works. then use /why to figure out why it broke recently.", why: "Mechanics first, history second. Each report names the sources it searched.", sources: ["guide/10-recipes-and-pitfalls.md"] },
   { id: "teach-tradeoffs", title: "Make the agent defend its choice", mode: "any", prompt: "/teach me why you implemented it this way and not <other way>. what were the tradeoffs you made and why?", why: "Explaining forces the agent to read the code and back its claims, which helps you trust the work.", sources: ["p2"] },
-  { id: "recall", title: "Pick up where you left off", mode: "brownfield", prompt: "/recall the work i did yesterday on <topic> and then read this bug report on slack", why: "Past chats hold context that a fresh agent would otherwise rebuild from scratch.", sources: ["p2"] },
+  { id: "recall", title: "Pick up where you left off", mode: "brownfield", prompt: "/recall the work i did yesterday on <topic> and then read this bug report on slack", why: "Past chats hold context that a fresh agent would otherwise rebuild from scratch. To resume one specific chat or branch, the Session pickup playbook fits better.", sources: ["p2", "playbooks/session-pickup.md"] },
   { id: "tutorial-first", title: "Design a package by writing its tutorial", mode: "greenfield", prompt: "/poteto-mode planning and /technical-writing to come up with <a new package>. let's start by writing a tutorial on how i would use this new package to <do the job>\nafter you write the plan, /teach me and prove to me why this new approach is superior to <the alternative>", why: "A tutorial gives the agent a concrete target to check its work against, and shows you what it will build.", sources: ["p2"] },
   { id: "prototype", title: "Prototype a few options", mode: "any", prompt: "/poteto-mode prototype a few options for <feature request>. use /verify-<app> and take videos/screenshots for me to review and choose from", why: "You choose from evidence, and the agent gets room to surprise you.", sources: ["p2", "playbooks/prototype.md"] },
   { id: "architect", title: "Sketch the design first", mode: "any", prompt: "/architect this new <feature request>", why: "Competing designs from different models get compared before code locks in a shape.", sources: ["p2", "skills/architect"] },
@@ -882,6 +886,7 @@ export const recipes = [
   { id: "morning-audit", title: "Audit last night's run", mode: "any", prompt: "/show-me-your-work catch me up on what you did last night", why: "A reviewer on another model reads the trail first, and the reply ends with what deserves your attention.", sources: ["guide/07-overnight.md"] },
   { id: "prove-it", title: "Redirect a run that claims success too early", mode: "any", prompt: "apply prove it works. show me the real output, not the build log.", why: "A principle name points at a full rule the agent has already read.", sources: ["guide/10-recipes-and-pitfalls.md"] },
   { id: "bro", title: "Get the reply in plain words", mode: "any", prompt: "/bro", why: "It restates the last message with no jargon, shorter.", sources: ["guide/10-recipes-and-pitfalls.md"] },
+  { id: "poteto-help", title: "Ask how without starting the work", mode: "any", prompt: "/poteto-help how do i keep poteto-mode on for a whole task?", why: "You get an answer, a prompt to send, and a link to the source. Nothing runs until you send that prompt.", sources: ["guide/10-recipes-and-pitfalls.md", "skills/poteto-help"] },
   { id: "reflect", title: "Capture a lesson after a hard task", mode: "any", prompt: "/reflect that took way too long. capture what we learned so the next run doesn't repeat it.", why: "Lessons become proposed skill edits, and nothing changes until you approve.", sources: ["guide/09-make-it-yours.md"] },
 ];
 
@@ -898,12 +903,16 @@ export const pitfalls = [
   { dont: "Accept the agent's first design.", do: "Ask for prototypes, or run `/architect`, which compares at least two designs before it builds.", sources: ["p2"] },
   { dont: "Overcook the plan before you have evidence.", do: "Answer open questions with prototypes and real runs. Then turn the settled design into a plan.", sources: ["p2"] },
   { dont: "Skip verification setup and check every change by hand.", do: "Run `/create-verification-skill` as soon as the app starts, so agents can prove their own work.", sources: ["p1", "skills/create-verification-skill"] },
+  { dont: "Expect `/poteto-mode` to stay on for the whole chat after you type it once.", do: "Type `/poteto-mode` at the start of each new task. On Cursor, start it as a Custom Mode with Option+Enter or Alt+Enter, and it stays on every turn until you exit it.", sources: ["skills/poteto-help", "guide/01-setup.md"] },
+  { dont: "Ask a new question mid-chat and expect the mode to treat it as new.", do: "Say `new task` first, so `/poteto-mode` picks a fresh playbook. Add \"don't change any code yet\" when you only want an answer.", sources: ["guide/02-poteto-mode.md", "skills/poteto-help"] },
+  { dont: "Wait for a skill to load on its own because the task matches it.", do: "Type the skill's name, or let `/poteto-mode` run it as a step. `/poteto-mode` doesn't run every skill, so name one such as `/typescript-best-practices` when you want it. Ask `/poteto-help` when you can't tell which one fits.", sources: ["skills/poteto-help", "guide/05-build-and-clean.md"] },
+  { dont: "Run every small, obvious edit through `/poteto-mode`.", do: "Save `/poteto-mode` for work that needs rigor. To spend fewer tokens, rerun `/setup-pvstack` and pick Budget mode, set a role to `inherit` so it runs on the chat's model, or shorten a panel list, because each entry runs one subagent.", sources: ["skills/poteto-help", "skills/setup-pvstack", "guide/01-setup.md"] },
 ];
 
 /** @type {{ term: string, plain: string }[]} */
 export const glossary = [
   { term: "Agent", plain: "An AI model that can read files, run commands, and edit code to finish a task." },
-  { term: "Skill", plain: "A folder of instructions, with a `SKILL.md` file, that your agent loads when the task matches or when you call it by name." },
+  { term: "Skill", plain: "A folder of instructions, with a `SKILL.md` file, that your agent loads when you call it by name, or when another skill such as `/poteto-mode` runs it." },
   { term: "Slash command", plain: "A skill called by typing `/` and its name, such as `/poteto-mode`. Codex uses `$` instead." },
   { term: "Playbook", plain: "A step-by-step workflow inside `poteto-mode`, such as Bug fix or Feature. The agent picks one for you. It is not a separate skill." },
   { term: "Principle", plain: "One of 24 short rules, such as Prove It Works. Say a principle's name to steer the agent mid-task." },
@@ -926,7 +935,7 @@ export const glossary = [
   { term: "PR stack", plain: "A chain of small PRs where each one builds on the one below it. You land them from the bottom up." },
   { term: "Role sheet", plain: "The file `~/.factory/pvstack-models.md`. It maps each kind of work, such as code or review, to a droid with a fixed model. `/setup-pvstack` writes it." },
   { term: "Droid", plain: "Factory's coding agent. In PV Stack, a droid named `pv-*` is also a preset agent with one fixed model and effort level." },
-  { term: "Sticky mode", plain: "`/poteto-mode` stays on for the rest of the chat after you call it, until you say to stop." },
+  { term: "Custom Mode", plain: "A Cursor feature that keeps a skill such as `/poteto-mode` on every turn until you exit it. Pick the skill from the `/` menu with Option+Enter on Mac or Alt+Enter on Windows. Without one, typing `/poteto-mode` applies it to one request, and it may fade as the chat moves on." },
 ];
 
 /** Intro text for the generated model-routing table. Rows come from plugins/pvstack/skills/setup-pvstack/modes/*.md. */
