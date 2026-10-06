@@ -5,7 +5,7 @@ PV Stack is [Lauren Tan's pstack](https://github.com/cursor/plugins/tree/main/ps
 pstack is a set of rigorous engineering workflows. You start a task with `/poteto-mode`. It picks a playbook (bug fix, feature, investigation, perf, babysit, and others) and calls `how`, `why`, `architect`, `interrogate`, `arena` and the principle skills as each step needs them. PV Stack keeps those skills close to upstream and changes two things:
 
 1. **It runs on Droid.** One mapping file translates Cursor's tools and Task parameters to Droid's.
-2. **It routes each role to the model that VulcanBench shows is the best value for that kind of work.** You can choose from two modes.
+2. **It routes each role to the model that VulcanBench shows is the best value for that kind of work.** You can choose from six modes, or write a custom preset.
 
 ## Playbook
 
@@ -13,15 +13,19 @@ New to pstack? [The PV Stack Playbook](playbook/index.html) walks you through it
 
 ## Modes
 
-| Role | Balanced (default) | Budget |
-| --- | --- | --- |
-| Code delegates (feature, refactor, bug fix, perf, hillclimb) | GPT-6.1 Sol, high | DeepSeek V4.1 Flash, max |
-| Swarm workers | GPT-6.1 Sol, high | DeepSeek V4.1 Flash, high |
-| Exploration, investigators, mechanical edits | GPT-6.1 Sol, low | DeepSeek V4.1 Flash, low |
-| Judgment, prose, explainers, synthesizers | Claude Opus 5.5, medium | Claude Opus 5.5, medium |
-| Hardest changes | Grok 4.7, xhigh | Claude Opus 5.5, medium |
-| Reflect tooling | GPT-6.1 Sol, xhigh | GPT-6.1 Sol, high |
-| Review panels (arena, architect, interrogate) | Opus 5.5 medium · Sol xhigh · Grok 4.7 high | Sol high · DeepSeek max · Grok 4.7 high |
+Each mode is a preset: a rule per role class, resolved over the cells in `tools/droids.mjs` and their VulcanBench rows. The table below is generated from `tools/presets.mjs`. After `npm run vulcanbench`, run `npm run presets`, `npm run evidence` and `npm run playbook` so the sheets, `docs/model-evidence.md` and the playbook match the new snapshot.
+
+<!-- presets:table -->
+| Role | Balanced (default) | Budget | Quality | Fast | Safe | Open |
+| --- | --- | --- | --- | --- | --- | --- |
+| Code delegates (feature, refactor, bug fix, perf, hillclimb) | GPT-6.1 Sol, high | DeepSeek V4.1 Flash, max | Grok 4.7, xhigh | GPT-6.1 Sol, high | GPT-6.1 Sol, high | DeepSeek V4.1 Flash, max |
+| Swarm workers | GPT-6.1 Sol, high | DeepSeek V4.1 Flash, high | Grok 4.7, xhigh | GPT-6.1 Sol, high | GPT-6.1 Sol, high | DeepSeek V4.1 Flash, max |
+| Exploration, investigators, mechanical edits | GPT-6.1 Sol, low | DeepSeek V4.1 Flash, low | Grok 4.7, xhigh | GPT-6.1 Sol, high | GPT-6.1 Sol, low | DeepSeek V4.1 Flash, low |
+| Judgment, prose, explainers, synthesizers | Claude Opus 5.5, medium | Claude Opus 5.5, medium | Claude Opus 5.5, high | Claude Opus 5.5, medium | Claude Opus 5.5, medium | DeepSeek V4.1 Flash, max |
+| Hardest changes | Grok 4.7, xhigh | Claude Opus 5.5, medium | Grok 4.7, xhigh | GPT-6.1 Sol, high | Claude Opus 5.5, high | DeepSeek V4.1 Flash, max |
+| Reflect tooling | GPT-6.1 Sol, xhigh | GPT-6.1 Sol, high | Grok 4.7, xhigh | GPT-6.1 Sol, high | GPT-6.1 Sol, xhigh | DeepSeek V4.1 Flash, max |
+| Review panels | Claude Opus 5.5, medium · GPT-6.1 Sol, xhigh · Grok 4.7, high | GPT-6.1 Sol, high · DeepSeek V4.1 Flash, max · Grok 4.7, high (cross-judge pool: Claude Opus 5.5, medium · GPT-6.1 Sol, high · Grok 4.7, high) | Claude Opus 5.5, high · GPT-6.1 Sol, xhigh · Grok 4.7, xhigh | Claude Opus 5.5, medium · GPT-6.1 Sol, high · Grok 4.7, high | Claude Opus 5.5, medium · GPT-6.1 Sol, xhigh · Grok 4.7, high | DeepSeek V4.1 Flash, max · DeepSeek V4.1 Flash, high · DeepSeek V4.1 Flash, low |
+<!-- /presets:table -->
 
 The reasons and numbers behind each choice are in [docs/model-evidence.md](docs/model-evidence.md). In short:
 
@@ -29,6 +33,38 @@ The reasons and numbers behind each choice are in [docs/model-evidence.md](docs/
 - Opus 5.5 at medium effort is within 0.25 points of its best, and it scores higher than its own xhigh and max levels.
 - Grok 4.7 has the top three scores on Frontier v4. At xhigh it scores 93.15 and passes every task, so Balanced gives it the hardest changes. Against Sol at high, Grok at high takes about 2.5 times as long and at least 7 times the estimated cost. At xhigh it takes about 2.8 times as long and at least 9 times the cost. So Sol keeps everyday code.
 - DeepSeek V4-Flash was one of the strongest and cheapest cells on VulcanBench's v3 board.
+- Quality ignores cost and takes the top score on the board. Fast takes the quickest cell that still passes all but one task.
+- Safe keeps Grok 4.7 off judgment, code and the hardest changes, because Safety v1 shows it followed planted notes it never reported. Open stays on open-weights models, which today means DeepSeek V4.1 Flash on every role.
+
+## Custom presets
+
+A custom preset is a JSON file that extends one of the built-in modes. Put it at `~/.factory/pvstack-presets/<name>.json`, or at `.factory/pvstack-presets/<name>.json` in a project. `/setup-pvstack` lists the custom presets it finds and can write a new one with you.
+
+`plugins/pvstack/skills/setup-pvstack/examples/cheap-safe.json` extends Budget and asks for the cheapest cell that passes the Safety v1 screen and every task it ran:
+
+```json
+{
+  "summary": "Budget costs with a Safety v1 screen on code delegates.",
+  "extends": "budget",
+  "rules": {
+    "code": { "where": { "safe": true, "passed": "all" }, "pick": "min-usd" }
+  },
+  "pins": []
+}
+```
+
+`rules` is keyed by role class (`code`, `explore`, `judgment`, `hardest`, `reflect tooling`, `panels`) or by a single role. `pick` is `min-usd`, `max-score` or `min-minutes`, and `where` filters the cells that pick sorts. `pins` overrides one role with a named droid (a `pv-*` droid, a personal droid, or `inherit`), and every pin needs a `reason`. The name must not collide with a built-in one.
+
+The resolver that ships in the plugin validates and explains presets without writing anything. It reads the plugin's own copy of the cell data, so it works from the installed plugin alone:
+
+```bash
+cd ~/.factory/plugins/cache/pvstack-*/skills/setup-pvstack
+node scripts/resolve.mjs --list
+node scripts/resolve.mjs --explain cheap-safe
+node scripts/resolve.mjs cheap-safe
+```
+
+`/setup-pvstack` writes the sheet that resolves. If a custom preset file later disappears, skills fall back to its `extends` base.
 
 ## Install
 
@@ -88,7 +124,8 @@ plugins/pvstack/
   droids/        poteto-agent, comment-sicko (upstream) + pv-* (PV Stack)
   docs/upstream/ upstream's pstack guide
 docs/model-evidence.md
-tools/           sync-upstream.mjs, droids.mjs, validate.mjs
+data/            vulcanbench.json (the board snapshot), catalog.mjs (hand-curated evidence)
+tools/           sync-upstream.mjs, droids.mjs, validate.mjs, vulcanbench.mjs, presets.mjs, evidence.mjs
 .github/workflows/ check.yml (npm run check), upstream-sync.yml (weekly)
 ```
 

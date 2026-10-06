@@ -1,0 +1,126 @@
+{
+  "balanced": {
+    "summary": "The default. It trades a little score for a lot of cost on the roles that run often, and buys the top score on the few changes that hurt most.",
+    "rules": {
+      "code": { "where": { "passed": "all", "scoreWithin": 5 }, "pick": "min-usd" },
+      "explore": { "pick": "min-minutes" },
+      "judgment": { "where": { "safetyEvidence": true }, "pick": "min-usd" },
+      "hardest": { "pick": "max-score" },
+      "reflect tooling": { "where": { "model": "gpt-6.1-sol" }, "pick": "max-score" },
+      "panels": {
+        "per": "lab",
+        "rosters": { "default": ["Anthropic", "OpenAI", "xAI"] },
+        "where": { "scoreWithin": 0.5 },
+        "pick": "min-usd"
+      }
+    },
+    "pins": []
+  },
+  "budget": {
+    "summary": "Spends as little as it can on the roles that run often. Code and exploration stay on the open DeepSeek model, judgment and the hardest changes keep the cheapest cell with a published cost and Safety v1 evidence, and the fan-out panels drop Opus.",
+    "rules": {
+      "code": { "where": { "model": "deepseek-v4.1-flash" }, "pick": "max-score" },
+      "explore": { "pick": "min-usd" },
+      "judgment": { "where": { "safetyEvidence": true }, "pick": "min-usd" },
+      "hardest": { "where": { "measuredUsd": true, "safetyEvidence": true }, "pick": "min-usd" },
+      "reflect tooling": { "where": { "model": "gpt-6.1-sol", "passed": "all" }, "pick": "min-usd" },
+      "panels": {
+        "per": "lab",
+        "rosters": { "default": ["OpenAI", "DeepSeek", "xAI"], "arena cross-judge pool": ["Anthropic", "OpenAI", "xAI"] },
+        "rosterNote": "the runners are OpenAI, DeepSeek and xAI, so the cross-judge pool needs an outside lab",
+        "where": { "scoreWithin": 1 },
+        "pick": "min-usd"
+      }
+    },
+    "pins": [
+      {
+        "role": "swarm workers",
+        "droid": "pv-ds-high",
+        "reason": "kept from the hand-written sheet; v3 favors pv-ds-max at a higher score and lower cost, 88.4 vs 87.0 and $0.06 vs $0.08; revisit"
+      }
+    ]
+  },
+  "quality": {
+    "summary": "Ignores cost and time. Every class takes the highest score on the board, except judgment, which stays on a model that reported the planted notes on Safety v1.",
+    "rules": {
+      "code": { "pick": "max-score" },
+      "explore": { "pick": "max-score" },
+      "judgment": { "where": { "safetyEvidence": true }, "pick": "max-score" },
+      "hardest": { "pick": "max-score" },
+      "reflect tooling": { "pick": "max-score" },
+      "panels": {
+        "per": "lab",
+        "rosters": { "default": ["Anthropic", "OpenAI", "xAI"] },
+        "pick": "max-score"
+      }
+    },
+    "pins": []
+  },
+  "fast": {
+    "summary": "Minimizes minutes. Every class takes the fastest cell that passed all but one task at most, so a slow cell only wins when nothing quicker finishes the work.",
+    "rules": {
+      "code": { "where": { "passed": "one" }, "pick": "min-minutes" },
+      "explore": { "where": { "passed": "one" }, "pick": "min-minutes" },
+      "judgment": { "where": { "passed": "one", "safetyEvidence": true }, "pick": "min-minutes" },
+      "hardest": { "where": { "passed": "one" }, "pick": "min-minutes" },
+      "reflect tooling": { "where": { "passed": "one" }, "pick": "min-minutes" },
+      "panels": {
+        "per": "lab",
+        "rosters": { "default": ["Anthropic", "OpenAI", "xAI"] },
+        "where": { "passed": "one" },
+        "pick": "min-minutes"
+      }
+    },
+    "pins": []
+  },
+  "safe": {
+    "summary": "Keeps Grok 4.7 out of judgment, code and the hardest changes, because Safety v1 shows it followed 14 of 80 planted notes and reported none of them. Grok still votes on panels, where models from other labs can outvote it.",
+    "rules": {
+      "code": { "where": { "safe": true, "passed": "all", "scoreWithin": 5 }, "pick": "min-usd" },
+      "explore": { "pick": "min-minutes" },
+      "judgment": { "where": { "safetyEvidence": true }, "pick": "min-usd" },
+      "hardest": { "where": { "safe": true }, "pick": "max-score" },
+      "reflect tooling": { "where": { "model": "gpt-6.1-sol" }, "pick": "max-score" },
+      "panels": {
+        "per": "lab",
+        "rosters": { "default": ["Anthropic", "OpenAI", "xAI"] },
+        "where": { "scoreWithin": 0.5 },
+        "pick": "min-usd"
+      }
+    },
+    "pins": []
+  },
+  "open": {
+    "summary": "Uses open-weights models only. DeepSeek V4.1 Flash is the only one on the board, so every role runs on it, judgment included, and the panel seats three of its effort levels.",
+    "rules": {
+      "code": { "where": { "openWeights": true }, "pick": "max-score" },
+      "explore": { "where": { "openWeights": true }, "pick": "min-usd" },
+      "judgment": { "where": { "openWeights": true, "safetyEvidence": true }, "pick": "max-score" },
+      "hardest": { "where": { "openWeights": true }, "pick": "max-score" },
+      "reflect tooling": { "where": { "openWeights": true }, "pick": "max-score" },
+      "panels": { "per": "effort", "count": 3, "where": { "openWeights": true }, "pick": "max-score" }
+    },
+    "pins": [
+      {
+        "role": "judgment and prose",
+        "droid": "pv-ds-max",
+        "reason": "the only open-weights model has no Safety v1 evidence, and this preset keeps every role on open weights"
+      },
+      {
+        "role": "how explainer",
+        "droid": "pv-ds-max",
+        "reason": "the only open-weights model has no Safety v1 evidence, and this preset keeps every role on open weights"
+      },
+      {
+        "role": "why synthesizer",
+        "droid": "pv-ds-max",
+        "reason": "the only open-weights model has no Safety v1 evidence, and this preset keeps every role on open weights"
+      },
+      {
+        "role": "reflect judgment, divergent, synthesizer",
+        "droid": "pv-ds-max",
+        "reason": "the only open-weights model has no Safety v1 evidence, and this preset keeps every role on open weights"
+      }
+    ]
+  }
+}

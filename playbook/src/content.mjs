@@ -153,7 +153,7 @@ export const chapters = [
     plain: [
       "Install the skills for your agent tool. The platform table lists the steps for Droid, Claude Code, Cursor, Codex, and other tools. On Droid, PV Stack installs with two commands.",
       "To check that the install worked, start a new session. Type `/poteto-mode`, or `$poteto-mode` on Codex, and see the skill load. You can also ask the agent to list its skills and look for `poteto-mode` in the list.",
-      "On Droid, run `/setup-pvstack` next. It asks you to pick a mode, Balanced or Budget, and writes a small file called the role sheet. The role sheet tells each skill which model to use for each job. On Cursor, the upstream version of this skill is `/setup-pstack`.",
+      "On Droid, run `/setup-pvstack` next. It asks you to pick a mode (Balanced, Budget, Quality, Fast, Safe or Open) and writes a small file called the role sheet. The role sheet tells each skill which model to use for each job. On Cursor, the upstream version of this skill is `/setup-pstack`.",
       "Then start every real task with `/poteto-mode`. You don't pick a playbook. It reads your request and picks one. Typing it applies the skill to that request. It may fade as the chat moves on, so type it again when you start the next task. On Cursor, a Custom Mode keeps it on every turn. The Cursor section under \"Install on your tool\" shows how.",
       "When you're stuck, or can't tell which skill fits, type `/poteto-help` with your question. It answers, hands you a prompt to send, and links the file the answer came from. It doesn't start the work, so nothing runs until you send that prompt.",
     ],
@@ -798,7 +798,7 @@ export const sharedStations = [{ id: "verify", station: "Verify" }, { id: "ship"
 /** @type {{ id: string, oneLine: string, trigger: string, needsRunningApp: boolean }[]} id = skill directory name */
 export const skills = [
   { id: "poteto-mode", oneLine: "The front door. Describe the goal, and it picks a playbook and runs the other skills as the steps need them.", trigger: "Start almost every real task with it.", needsRunningApp: false },
-  { id: "setup-pvstack", oneLine: "Picks Balanced or Budget mode on Droid and writes the role sheet that maps each role to a model. Upstream pstack on Cursor has `/setup-pstack` instead.", trigger: "Once after you install PV Stack, and again to change a role.", needsRunningApp: false },
+  { id: "setup-pvstack", oneLine: "Picks a mode on Droid and writes the role sheet that maps each role to a model. Upstream pstack on Cursor has `/setup-pstack` instead.", trigger: "Once after you install PV Stack, and again to change a role.", needsRunningApp: false },
   { id: "poteto-help", oneLine: "Answers a question about pstack, such as which skill fits or why a run went wrong, and hands you a prompt to send. It doesn't start the work.", trigger: "When you're stuck, or can't tell which skill, playbook, or principle fits.", needsRunningApp: false },
   { id: "create-verification-skill", oneLine: "Studies your repo and writes a project-local `verify-<app>` skill that launches, drives, and proves your app, plus a Feature Map.", trigger: "As soon as your app starts from one command.", needsRunningApp: true },
   { id: "maintain-verification-skill", oneLine: "Drives every feature in the Feature Map and ships at most one PR of proven fixes to the verification skill.", trigger: "Daily, or whenever the app changed.", needsRunningApp: true },
@@ -942,7 +942,7 @@ export const glossary = [
 export const routing = {
   plain: [
     "pstack sends different jobs to different models. A fast, cheap model can search code. A careful model can write prose and make judgment calls. A strong model takes the hardest changes. Each kind of job is called a role.",
-    "PV Stack picks the model for each role from VulcanBench, an open benchmark of real engineering tasks that reports score, time, and cost. `/setup-pvstack` offers two modes. Balanced is the default. Budget uses cheaper models for code, search, and mechanical work.",
+    "PV Stack picks the model for each role from VulcanBench, an open benchmark of real engineering tasks that reports score, time, and cost. `/setup-pvstack` offers six modes. Balanced is the default, and Budget, Quality, Fast, Safe and Open trade score, minutes, cost and safety differently.",
     "You can override any role. The table below lists every role and the droid each mode gives it. A droid here is a preset agent with one fixed model and effort level.",
   ],
   deeper: [
@@ -950,5 +950,6 @@ export const routing = {
     "Judgment and prose go to Claude Opus 5.5 at medium effort, which passes 23 of 23 tasks at 90.86. Its xhigh and max levels score lower and cost more. On VulcanBench's Safety v1 tasks, Opus reported 64 of 100 planted repository notes to the user, and Grok 4.7 reported none of 80. That matters for roles that write what you read.",
     "The hardest changes in Balanced mode go to Grok 4.7 at xhigh effort. It is the top Frontier v4 cell at 93.15, with every task passed. It takes 28.5 minutes per task, so it is kept for the few changes where a miss costs the most. Review panels mix models from three labs, because findings that independent models agree on carry more weight.",
     "Budget mode uses DeepSeek V4.1 Flash for code, search, and mechanical work. That pick is inferred, because VulcanBench measured the older V4-Flash on its retired v3 board, and v3 numbers can't be compared with v4. Every Frontier v4 run also used another agent tool, not Droid, and VulcanBench measured tool effects of up to about 20 points on a single model. Treat every pick as a strong starting point, and read `docs/model-evidence.md` for each number and its source.",
+    "The other four modes read the same board. Quality ignores cost and takes the top score. Fast takes the quickest cell that still passes the tasks. Safe keeps Grok 4.7 off judgment, code, and the hardest changes, on its Safety v1 result. Open stays on open-weights models, which today means DeepSeek V4.1 Flash on every role.",
   ],
 };
