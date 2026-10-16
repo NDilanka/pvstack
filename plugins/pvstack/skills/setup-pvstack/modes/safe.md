@@ -8,7 +8,7 @@ perf-issue: pv-sol-high
 hillclimb: pv-sol-high
 mechanical edits: pv-sol-low
 judgment and prose: pv-opus-medium
-hardest tasks: pv-haiku-max
+hardest tasks: pv-opus-high
 how explorer: pv-sol-low
 how explainer: pv-opus-medium
 why investigators: pv-sol-low

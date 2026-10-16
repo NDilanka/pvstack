@@ -1,12 +1,14 @@
 #!/usr/bin/env node
 // Startup context each pvstack entry point loads before any task work, in bytes and
 // estimated tokens (bytes / 4). It follows the same rules the agents follow: a droid's
-// prompt names the skill a poteto-agent delegate loads, and a skill carrying the droid
-// note pulls in droid-tools.md once per session.
+// prompt names the skill a poteto-agent delegate loads, a skill carrying the droid note
+// pulls in droid-tools.md once per session, and droid-tools.md sends the reader to the
+// role sheet (Balanced when the user has none).
 //
 //   node tools/footprint.mjs              the working tree
 //   node tools/footprint.mjs --ref main   the working tree next to a git ref
-//   node tools/footprint.mjs --check      exit 1 if a code delegate loads half or more of what /poteto-mode loads
+//   node tools/footprint.mjs --check      exit 1 if any pv-* droid or poteto-agent, prompted as poteto-agent,
+//                                         loads half or more of what /poteto-mode loads
 
 import { execFileSync } from "node:child_process";
 import fs from "node:fs";
@@ -54,7 +56,7 @@ function measure(entry, read) {
   };
   const loadSkill = (name) => {
     const text = load(`${PLUGIN}/skills/${name}/SKILL.md`);
-    if (text?.includes(NOTE_MARKER)) load(DROID_TOOLS);
+    if (text?.includes(NOTE_MARKER) && load(DROID_TOOLS) !== null) load(SHEET);
   };
   const skills = [...(entry.skills ?? [])];
   if (entry.droid) {
@@ -73,24 +75,46 @@ function measure(entry, read) {
 
 const fmt = (r) => (r ? `${(r.bytes / 1024).toFixed(1)} KB, ~${Math.round(r.bytes / 4 / 100) / 10}k tokens` : "n/a");
 
+function fail(message) {
+  console.error(`footprint: ${message}`);
+  process.exit(1);
+}
+
+function parseRef(args) {
+  const refIdx = args.indexOf("--ref");
+  if (refIdx < 0) return null;
+  const ref = args[refIdx + 1];
+  if (!ref || ref.startsWith("--")) fail("--ref needs a git ref, for example --ref main.");
+  if (args.includes("--check")) fail("--check measures the working tree only; drop --ref.");
+  try {
+    execFileSync("git", ["rev-parse", "--verify", "--quiet", `${ref}^{commit}`], { cwd: root, stdio: "ignore" });
+  } catch {
+    fail(`${ref} is not a commit in this clone.`);
+  }
+  return ref;
+}
+
+function check(read) {
+  const parent = measure(ENTRIES[0], read).bytes;
+  const pct = (bytes) => Math.round((100 * bytes) / parent);
+  const droids = fs
+    .readdirSync(path.join(root, PLUGIN, "droids"))
+    .filter((f) => /^(pv-.*|poteto-agent)\.md$/.test(f))
+    .map((f) => f.replace(/\.md$/, ""))
+    .sort();
+  const results = droids.map((droid) => ({ droid, bytes: measure({ droid, prefixed: true }, read).bytes }));
+  const over = results.filter((r) => r.bytes * 2 >= parent);
+  for (const r of over) console.error(`footprint: ${r.droid} as poteto-agent loads ${r.bytes} bytes, ${pct(r.bytes)}% of /poteto-mode's ${parent}. Keep it under half.`);
+  if (over.length) process.exit(1);
+  const largest = results.reduce((a, b) => (b.bytes > a.bytes ? b : a));
+  console.log(`footprint: ${results.length} delegate droids checked; largest ${largest.droid} ${fmt(largest)} (${pct(largest.bytes)}%) of /poteto-mode.`);
+}
+
 function main() {
   const args = process.argv.slice(2);
-  const refIdx = args.indexOf("--ref");
-  const ref = refIdx >= 0 ? args[refIdx + 1] : null;
+  const ref = parseRef(args);
+  if (args.includes("--check")) return check(reader(null));
   const now = Object.fromEntries(ENTRIES.map((e) => [e.name, measure(e, reader(null))]));
-
-  if (args.includes("--check")) {
-    const parent = now[ENTRIES[0].name].bytes;
-    const pct = (bytes) => Math.round((100 * bytes) / parent);
-    const delegates = ENTRIES.filter((e) => e.prefixed);
-    const over = delegates.filter((e) => now[e.name].bytes * 2 >= parent);
-    if (over.length) {
-      for (const e of over) console.error(`footprint: ${e.name} loads ${now[e.name].bytes} bytes, ${pct(now[e.name].bytes)}% of /poteto-mode's ${parent}. Keep it under half.`);
-      process.exit(1);
-    }
-    console.log(`footprint: ${delegates.map((e) => `${e.droid} ${fmt(now[e.name])} (${pct(now[e.name].bytes)}%)`).join(", ")} of /poteto-mode.`);
-    return;
-  }
 
   const then = ref
     ? Object.fromEntries(

@@ -188,7 +188,7 @@
     "pins": []
   },
   "safe": {
-    "summary": "Keeps Grok 4.7 out of judgment, code and the hardest changes, because Safety v1 shows it followed 14 of 80 planted notes and reported none of them. Grok still votes on panels, where models from other labs can outvote it.",
+    "summary": "Keeps Grok 4.7 out of judgment, code and the hardest changes, because Safety v1 shows it followed 14 of 80 planted notes and reported none of them. Judgment and the hardest changes go only to a model that Safety v1 saw report planted notes to the user. Grok still votes on panels, where models from other labs can outvote it.",
     "rules": {
       "code": {
         "where": {
@@ -209,7 +209,7 @@
       },
       "hardest": {
         "where": {
-          "safe": true
+          "safetyEvidence": true
         },
         "pick": "max-score"
       },

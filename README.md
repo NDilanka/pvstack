@@ -22,7 +22,7 @@ Each mode is a preset: a rule per role class, resolved over the cells in `tools/
 | Swarm workers | GPT-6.1 Sol, high | DeepSeek V4.1 Flash, high | Grok 4.7, xhigh | GPT-6.1 Sol, high | GPT-6.1 Sol, high | DeepSeek V4.1 Flash, high |
 | Exploration, investigators, mechanical edits | GPT-6.1 Sol, low | DeepSeek V4.1 Flash, low | GPT-6.1 Sol, high | GPT-6.1 Sol, low | GPT-6.1 Sol, low | DeepSeek V4.1 Flash, low |
 | Judgment, prose, explainers, synthesizers | Claude Opus 5.5, medium | Claude Opus 5.5, medium | Claude Opus 5.5, high | Claude Opus 5.5, medium | Claude Opus 5.5, medium | DeepSeek V4.1 Flash, high |
-| Hardest changes | Grok 4.7, xhigh | Claude Opus 5.5, medium | Grok 4.7, xhigh | GPT-6.1 Sol, high | Claude Haiku 5.5, max | DeepSeek V4.1 Flash, high |
+| Hardest changes | Grok 4.7, xhigh | Claude Opus 5.5, medium | Grok 4.7, xhigh | GPT-6.1 Sol, high | Claude Opus 5.5, high | DeepSeek V4.1 Flash, high |
 | Reflect tooling | GPT-6.1 Sol, xhigh | GPT-6.1 Sol, high | Grok 4.7, xhigh | GPT-6.1 Sol, high | GPT-6.1 Sol, xhigh | DeepSeek V4.1 Flash, high |
 | Review panels | Claude Haiku 5.5, xhigh · GPT-6.1 Sol, xhigh · Grok 4.7, high | GPT-6.1 Sol, high · DeepSeek V4.1 Flash, low · Grok 4.7, high (cross-judge pool: Claude Haiku 5.5, xhigh · GPT-6.1 Sol, high · Grok 4.7, high) | Claude Haiku 5.5, max · GPT-6.1 Sol, xhigh · Grok 4.7, xhigh | Claude Opus 5.5, medium · GPT-6.1 Sol, high · Grok 4.7, high | Claude Haiku 5.5, xhigh · GPT-6.1 Sol, xhigh · Grok 4.7, high | DeepSeek V4.1 Flash, max · DeepSeek V4.1 Flash, high · DeepSeek V4.1 Flash, low |
 <!-- /presets:table -->
@@ -33,7 +33,7 @@ The reasons and numbers behind each choice are in [docs/model-evidence.md](docs/
 - Opus 5.5 at medium effort is within 0.25 points of its best, and it scores higher than its own xhigh and max levels.
 - Grok 4.7 has the top three scores on Frontier v4. At xhigh it scores 93.15 and passes every task, so Balanced gives it the hardest changes. Against Sol at high, Grok at high takes about 2.5 times as long and at least 7 times the estimated cost. At xhigh it takes about 2.8 times as long and at least 9 times the cost. So Sol keeps everyday code.
 - DeepSeek V4-Flash was one of the strongest and cheapest cells on VulcanBench's v3 board. pvstack's own Droid run of VulcanBench's Python Suite v1 (345 runs) found DeepSeek V4.1 Flash at high effort resolving as many tasks as GPT-6.1 Sol at low on about half the credits. Max effort cost twice as much as high and resolved no more, so Budget runs code on high. See [Measured in Droid](docs/model-evidence.md#measured-in-droid).
-- Claude Haiku 5.5 joined the board on 2026-10-16. At xhigh effort it scores 91.83, above every Opus 5.5 level, and Droid bills it at 0.04× against Opus's 1.6×. It takes the Anthropic seat on review panels, and Safe gives it the hardest changes at max effort. It has no Safety v1 result, so judgment and prose stay on Opus.
+- Claude Haiku 5.5 joined the board on 2026-10-16. At xhigh effort it scores 91.83, above every Opus 5.5 level, and Droid bills it at 0.04× against Opus's 1.6×. It takes the Anthropic seat on review panels. It has no Safety v1 result, so judgment, prose and Safe's hardest changes stay on Opus.
 - Quality ignores cost and takes the top score on the board. Fast takes the quickest cell that still passes all but one task.
 - Safe keeps Grok 4.7 off judgment, code and the hardest changes, because Safety v1 shows it followed planted notes it never reported. Open stays on open-weights models, which today means DeepSeek V4.1 Flash on every role.
 
@@ -100,9 +100,9 @@ flowchart LR
 
 ## Token use
 
-The chat that runs `/poteto-mode` loads the whole skill and `droid-tools.md` once. A delegate loads `poteto-delegate` instead. That skill holds the parts of `poteto-mode` a subagent uses (the Principles index, the pause rules, and the reply and comment rules), and the sync generates it from upstream. A code delegate starts with about 2.5k tokens of pvstack context instead of 6.9k. Lookups and checks get a plain prompt and load no skill at all. `droid-tools.md` also carries token rules taken from a real 185M-credit mission. They cover reading by section, keeping tool output small, rerunning only failed checks and what the fix touched, scripting repeated setup, and letting a Droid Mission's validators replace pvstack's review fan-out.
+The chat that runs `/poteto-mode` loads the whole skill and `droid-tools.md` once. A delegate loads `poteto-delegate` instead. That skill holds the parts of `poteto-mode` a subagent uses (the Principles index, the pause rules, and the reply and comment rules), and the sync generates it from upstream. A code delegate starts with about 2.5k tokens of pvstack context instead of 7.2k. Lookups and checks get a plain prompt and load no skill at all. `droid-tools.md` also carries token rules taken from a real 185M-credit mission. They cover reading by section, keeping tool output small, rerunning only failed checks and what the fix touched, scripting repeated setup, and letting a Droid Mission's validators replace pvstack's review fan-out.
 
-`npm run footprint` prints the startup context of each entry point. `npm run check` fails if a code delegate's context reaches half of what `/poteto-mode` loads. The mission numbers, the before and after, and what was left alone on purpose are in [docs/token-budget.md](docs/token-budget.md).
+`npm run footprint` prints the startup context of each entry point. `npm run check` fails if any `pv-*` droid or `poteto-agent`, prompted as a delegate, reaches half of what `/poteto-mode` loads. The mission numbers, the before and after, and what was left alone on purpose are in [docs/token-budget.md](docs/token-budget.md).
 
 ## Staying current with upstream
 
