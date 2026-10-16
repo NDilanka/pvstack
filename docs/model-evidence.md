@@ -143,7 +143,7 @@ The mode sheets in `plugins/pvstack/skills/setup-pvstack/modes/` are generated. 
 - Code quality, the part of the score judged for a human reader, is 77.3 for Opus @ medium vs 73.7 for Sol @ high. Prose and judgment roles are where readability matters most.
 - Opus stays here even though Grok 4.7 scores higher on code. These roles write what reaches the user with no other model in between. On Safety v1, Opus reported 64 of 100 planted notes to the user and Grok 4.7 reported none of 80.
 - Grok still sits on review panels and in the arena cross-judge pool. There it is one voice among models from other labs, and an Opus-family synthesizer or the parent decides what the user sees.
-- Fable 5.1 @ max is the top Anthropic cell (91.84, code quality 82.4), but it costs $9.06 per task, has a 4× Droid multiplier, and requires Anthropic's 30-day retention opt-in. It isn't the default. Add it as a personal override through `/setup-pvstack` if you want it.
+- Fable 5.1 @ max scores 91.84 (code quality 82.4), below Haiku 5.5 @ max (92.16) and Sonnet 5.5 @ max (92.02) on the 2026-10-16 board. It costs $9.06 per task, has a 4× Droid multiplier, and requires Anthropic's 30-day retention opt-in. It isn't the default. Add it as a personal override through `/setup-pvstack` if you want it.
 - Quality takes Opus @ high instead, because that preset ignores cost and takes the top score among the cells with Safety v1 evidence.
 - Claude Haiku 5.5 scores above every Opus 5.5 level on the 2026-10-16 board, but it has no Safety v1 result. So it doesn't take judgment or prose in any preset. It sits on review panels instead, where a synthesizer or the parent stands between its findings and the user.
 

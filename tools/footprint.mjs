@@ -59,8 +59,11 @@ function measure(entry, read) {
   const skills = [...(entry.skills ?? [])];
   if (entry.droid) {
     const text = load(`${PLUGIN}/droids/${entry.droid}.md`);
-    const skill = entry.prefixed ? delegateSkill(text) : null;
-    if (skill) skills.push(skill);
+    if (entry.prefixed) {
+      const skill = delegateSkill(text);
+      if (!skill) throw new Error(`${entry.droid}.md names no skill to load; update delegateSkill in tools/footprint.mjs`);
+      skills.push(skill);
+    }
   }
   for (const name of skills) loadSkill(name);
   for (const rel of entry.files ?? []) load(rel);
@@ -78,12 +81,14 @@ function main() {
 
   if (args.includes("--check")) {
     const parent = now[ENTRIES[0].name].bytes;
-    const delegate = now[ENTRIES[2].name].bytes;
-    if (delegate * 2 >= parent) {
-      console.error(`footprint: a code delegate loads ${delegate} bytes, ${Math.round((100 * delegate) / parent)}% of /poteto-mode's ${parent}. Keep it under half.`);
+    const pct = (bytes) => Math.round((100 * bytes) / parent);
+    const delegates = ENTRIES.filter((e) => e.prefixed);
+    const over = delegates.filter((e) => now[e.name].bytes * 2 >= parent);
+    if (over.length) {
+      for (const e of over) console.error(`footprint: ${e.name} loads ${now[e.name].bytes} bytes, ${pct(now[e.name].bytes)}% of /poteto-mode's ${parent}. Keep it under half.`);
       process.exit(1);
     }
-    console.log(`footprint: code delegate ${fmt(now[ENTRIES[2].name])}, ${Math.round((100 * delegate) / parent)}% of /poteto-mode.`);
+    console.log(`footprint: ${delegates.map((e) => `${e.droid} ${fmt(now[e.name])} (${pct(now[e.name].bytes)}%)`).join(", ")} of /poteto-mode.`);
     return;
   }
 

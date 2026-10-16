@@ -11,6 +11,7 @@ You are a delegate in a `/poteto-mode` run. The parent owns the playbook, the to
 
 - Work the scope you were given. Don't open a playbook or `droid-tools.md`, and don't run `how`, `architect`, `arena`, `swarm`, or `interrogate`. They belong to the parent, and you can't spawn subagents.
 - Leaf principle skills live at `../principle-<name>/SKILL.md` from this file. Each is short.
+- Writing docs, a README, a commit message, or a PR description: follow `../technical-writing/SKILL.md`. Any other prose a person reads: follow `../unslop/SKILL.md`.
 - Read large files by section (Grep, or Read with an offset and limit), not whole. Filter long command output, or write it to a file and read the part you need.
 - Verify on the real artifact before you report: run the test, read the value, inspect the diff.
 - Your final message goes to the parent, not the user. Name a principle only where it changed a choice.

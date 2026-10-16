@@ -46,7 +46,7 @@ Each rule below cut a measured cost in a real pvstack mission. The numbers are i
 - **Delegates load `poteto-delegate`, not `poteto-mode`.** It is about a third of the size of `poteto-mode/SKILL.md` plus this file.
 - **Point, don't paste, and point at the section.** Give a delegate the path plus a line range, heading, or Grep pattern. A shared note over about 20 KB gets a short index at its top, and readers read the section they need.
 - **Keep tool output small.** Filter with `rg`, `Select-Object -First`, or `head`, or write the output to a file and read the part you need. Raw multi-thousand-line output stays in the context for every later turn.
-- **Rerun only what failed.** After a failed gate, the next round re-checks the failing assertions and reuses passing evidence unchanged.
+- **Rerun only what failed, plus what the fix touched.** After a failed gate, the next round re-checks the failing assertions and any check that covers code the fix changed. Passing evidence for untouched code is reused as is.
 - **Script a setup the second time you run it.** A per-round harness rebuilt by hand cost hundreds of times the run it set up. Parameterize it once (the **build-the-lever** principle skill) and have later rounds call it.
 - **Inside a Droid Mission, the mission's validators are the review system.** Workers skip `arena`, `swarm`, `interrogate`, review panels, and second-opinion delegates, and own their diff directly. This replaces the Feature playbook's mandatory arena. A worker still runs `how` when the subsystem is new to it.
 

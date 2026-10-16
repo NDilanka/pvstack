@@ -1,6 +1,6 @@
 ---
 name: pv-opus-medium
-description: "pvstack role droid pinned to Claude Opus 5.5, medium effort. Judgment, prose, explainers, synthesizers, and review panels. Spawn it when the pvstack role sheet maps a role to pv-opus-medium."
+description: "pvstack role droid pinned to Claude Opus 5.5, medium effort. Judgment, prose, explainers, synthesizers, and the Fast preset's review panels. Spawn it when the pvstack role sheet maps a role to pv-opus-medium."
 model: claude-opus-5-5
 reasoningEffort: medium
 ---
