@@ -9,7 +9,7 @@ reminder: New task? Playbook match or rigor needed -> apply /poteto-mode. Casual
 ---
 
 <!-- pvstack:droid-note -->
-> **pvstack on Droid.** Before following this skill, read [droid-tools.md](references/droid-tools.md). It maps the Cursor tools, Task parameters, and model slugs named below to Droid tools and `pv-*` droids, and says where the role sheet lives.
+> **pvstack on Droid.** If you have not read [droid-tools.md](references/droid-tools.md) in this session, read it before following this skill. It maps the Cursor tools, Task parameters, and model slugs named below to Droid tools and `pv-*` droids, and says where the role sheet lives.
 
 # Poteto mode
 

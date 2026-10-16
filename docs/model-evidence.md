@@ -2,7 +2,7 @@
 
 pvstack picks a model and reasoning effort for every pstack role from the published results of [VulcanBench](https://vulcanbench.com), Morgan Linton's open-source benchmark for real engineering tasks ([methodology](https://vulcanbench.com/methodology.html)). This page records each number it relies on, where the number comes from, and which picks are inferred rather than measured.
 
-Data pulled on 2026-10-06 from:
+Data pulled on 2026-10-16 from:
 
 - Frontier v4 leaderboard and Routine v1 board: https://vulcanbench.com/leaderboard.html (CSV: https://vulcanbench.com/assets/data/swe-v4-board.csv, https://vulcanbench.com/assets/data/routine-v1-board.csv)
 - Grok 4.7 report (Frontier v4, Routine v1 and Safety v1), published 2026-10-04: https://vulcanbench.com/benchmarks/swe-v4-grok47-cursor-v320.html (per-run data: https://vulcanbench.com/assets/data/swe-v4-grok47-cursor-v320/runs.csv)
@@ -28,6 +28,8 @@ Data pulled on 2026-10-06 from:
 | `pv-sol-xhigh` | GPT-6.1 Sol / xhigh | 88.78 | 23/23 | $0.43 | 15.4 | 0.8× |
 | `pv-opus-medium` | Claude Opus 5.5 / medium | 90.86 | 23/23 | $2.84 | 18.6 | 1.6× |
 | `pv-opus-high` | Claude Opus 5.5 / high | 91.11 | 22/22 | $3.27 | 21.4 | 1.6× |
+| `pv-haiku-xhigh` | Claude Haiku 5.5 / xhigh | 91.83 | 22/23 | $0.84 | 19.0 | 0.04× |
+| `pv-haiku-max` | Claude Haiku 5.5 / max | 92.16 | 22/23 | $1.54 | 27.7 | 0.04× |
 | `pv-grok-high` | Grok 4.7 / high | 92.71 | 22/23 | ~$2.19 (estimate) | 25.4 | 0.8× |
 | `pv-grok-xhigh` | Grok 4.7 / xhigh | 93.15 | 23/23 | ~$2.96 (estimate) | 28.5 | 0.8× |
 <!-- /vulcanbench:cells -->
@@ -67,7 +69,7 @@ The mode sheets in `plugins/pvstack/skills/setup-pvstack/modes/` are generated. 
 - Judgment, prose, explainers, synthesizers: `pv-opus-medium` (cheapest cell whose model reported planted notes to the user on Safety v1).
 - Hardest changes: `pv-grok-xhigh` (highest-scoring cell).
 - Reflect tooling: `pv-sol-xhigh` (highest-scoring cell that runs on GPT-6.1 Sol).
-- Review panels: `pv-opus-medium`, `pv-sol-xhigh`, `pv-grok-high` (cheapest cell that scores within 0.5 points of the best cell in its pool, one cell per lab, from Anthropic, OpenAI, xAI).
+- Review panels: `pv-haiku-xhigh`, `pv-sol-xhigh`, `pv-grok-high` (cheapest cell that scores within 0.5 points of the best cell in its pool, one cell per lab, from Anthropic, OpenAI, xAI).
 - Pins: none.
 
 **Budget.** Spends as little as it can on the roles that run often. Code and exploration stay on the open DeepSeek model, judgment and the hardest changes keep the cheapest cell with a published cost and Safety v1 evidence, and the fan-out panels drop Opus. DeepSeek effort levels that the Droid run shows a cheaper level beating are skipped.
@@ -80,7 +82,7 @@ The mode sheets in `plugins/pvstack/skills/setup-pvstack/modes/` are generated. 
 - Reflect tooling: `pv-sol-high` (cheapest cell that runs on GPT-6.1 Sol and passed every task it ran).
 - Review panels: `pv-sol-high`, `pv-ds-low`, `pv-grok-high` (cheapest cell that scores within 1 point of the best cell in its pool and no cell of the same model beats in the Droid run with more tasks resolved on fewer credits, one cell per lab, from OpenAI, DeepSeek, xAI; arena cross-judge pool from Anthropic, OpenAI, xAI, because the runners are OpenAI, DeepSeek and xAI, so the cross-judge pool needs an outside lab).
   - arena runners, architect runners, interrogate reviewers: `pv-sol-high`, `pv-ds-low`, `pv-grok-high`
-  - arena cross-judge pool: `pv-opus-medium`, `pv-sol-high`, `pv-grok-high`
+  - arena cross-judge pool: `pv-haiku-xhigh`, `pv-sol-high`, `pv-grok-high`
 - Pins: none.
 
 **Quality.** Ignores cost. Every class takes the highest score on the board, except judgment, which stays on a model that reported the planted notes on Safety v1, and exploration, which only reads code and takes the fastest cell that passed every task.
@@ -91,7 +93,7 @@ The mode sheets in `plugins/pvstack/skills/setup-pvstack/modes/` are generated. 
 - Judgment, prose, explainers, synthesizers: `pv-opus-high` (highest-scoring cell whose model reported planted notes to the user on Safety v1).
 - Hardest changes: `pv-grok-xhigh` (highest-scoring cell).
 - Reflect tooling: `pv-grok-xhigh` (highest-scoring cell).
-- Review panels: `pv-opus-high`, `pv-sol-xhigh`, `pv-grok-xhigh` (highest-scoring cell, one cell per lab, from Anthropic, OpenAI, xAI).
+- Review panels: `pv-haiku-max`, `pv-sol-xhigh`, `pv-grok-xhigh` (highest-scoring cell, one cell per lab, from Anthropic, OpenAI, xAI).
 - Pins: none.
 
 **Fast.** Minimizes minutes. Every class that writes code or judges it takes the fastest cell that failed at most one task. Exploration only reads code, and Routine v1 shows the lowest effort level is enough there, so it takes the fastest cell outright.
@@ -111,9 +113,9 @@ The mode sheets in `plugins/pvstack/skills/setup-pvstack/modes/` are generated. 
 - Swarm workers: `pv-sol-high` (cheapest cell that passes the Safety v1 screen and passed every task it ran and scores within 5 points of the best cell in its pool).
 - Exploration, investigators, mechanical edits: `pv-sol-low` (fastest cell).
 - Judgment, prose, explainers, synthesizers: `pv-opus-medium` (cheapest cell whose model reported planted notes to the user on Safety v1).
-- Hardest changes: `pv-opus-high` (highest-scoring cell that passes the Safety v1 screen).
+- Hardest changes: `pv-haiku-max` (highest-scoring cell that passes the Safety v1 screen).
 - Reflect tooling: `pv-sol-xhigh` (highest-scoring cell that runs on GPT-6.1 Sol).
-- Review panels: `pv-opus-medium`, `pv-sol-xhigh`, `pv-grok-high` (cheapest cell that scores within 0.5 points of the best cell in its pool, one cell per lab, from Anthropic, OpenAI, xAI).
+- Review panels: `pv-haiku-xhigh`, `pv-sol-xhigh`, `pv-grok-high` (cheapest cell that scores within 0.5 points of the best cell in its pool, one cell per lab, from Anthropic, OpenAI, xAI).
 - Pins: none.
 
 **Open.** Uses open-weights models only. DeepSeek V4.1 Flash is the only one on the board, so every role runs on it, judgment included, and the panel seats three of its effort levels. Max effort leaves the single-seat roles because the Droid run measured it resolving fewer tasks than high on more than twice the credits.
@@ -141,14 +143,16 @@ The mode sheets in `plugins/pvstack/skills/setup-pvstack/modes/` are generated. 
 - Code quality, the part of the score judged for a human reader, is 77.3 for Opus @ medium vs 73.7 for Sol @ high. Prose and judgment roles are where readability matters most.
 - Opus stays here even though Grok 4.7 scores higher on code. These roles write what reaches the user with no other model in between. On Safety v1, Opus reported 64 of 100 planted notes to the user and Grok 4.7 reported none of 80.
 - Grok still sits on review panels and in the arena cross-judge pool. There it is one voice among models from other labs, and an Opus-family synthesizer or the parent decides what the user sees.
-- Fable 5.1 @ max is the top Anthropic cell (91.84, code quality 82.4), but it costs $9.06 per task, has a 4× Droid multiplier, and requires Anthropic's 30-day retention opt-in. It isn't the default. Add it as a personal override through `/setup-pvstack` if you want it.
-- Quality takes Opus @ high instead, because that preset ignores cost and takes the top score among the cells with Safety v1 evidence. Safe takes it for the hardest changes, where Grok 4.7 is excluded.
+- Fable 5.1 @ max scores 91.84 (code quality 82.4), below Haiku 5.5 @ max (92.16) and Sonnet 5.5 @ max (92.02) on the 2026-10-16 board. It costs $9.06 per task, has a 4× Droid multiplier, and requires Anthropic's 30-day retention opt-in. It isn't the default. Add it as a personal override through `/setup-pvstack` if you want it.
+- Quality takes Opus @ high instead, because that preset ignores cost and takes the top score among the cells with Safety v1 evidence.
+- Claude Haiku 5.5 scores above every Opus 5.5 level on the 2026-10-16 board, but it has no Safety v1 result. So it doesn't take judgment or prose in any preset. It sits on review panels instead, where a synthesizer or the parent stands between its findings and the user.
 
-### Hardest tasks: Grok 4.7 @ xhigh (Balanced), Opus 5.5 @ medium (Budget)
+### Hardest tasks: Grok 4.7 @ xhigh (Balanced), Opus 5.5 @ medium (Budget), Haiku 5.5 @ max (Safe)
 - Grok 4.7 xhigh is the top cell on Frontier v4: 93.15, every task passed, and all 231 hidden behaviours fixed. Opus 5.5 high, the previous pick, scores 91.11. The lead holds on the shared judge alone (92.27 vs 91.03).
 - Droid bills Grok at 0.8× against Opus's 1.6×. That is the measured cost argument. The API estimate is at least $2.96 per task against Opus high's measured $3.27, but it leaves requests above 200K context at the base rate, so the real figure may be higher.
 - It is slower, 28.5 minutes per task against 21.4. That is acceptable for the few changes that reach this role.
 - The parent reviews every delegate's diff (poteto-mode's Subagents section). That review is the check on Grok's Safety v1 result.
+- Safe takes Claude Haiku 5.5 @ max (92.16, 22/23, $1.54, 0.04×). Its rule takes the top score among cells that pass the Safety v1 screen, and the screen excludes only models that Safety v1 caught following planted notes. Haiku has no Safety v1 result, the same as Sol and DeepSeek. It replaces Opus 5.5 @ high (91.11, 22/22, $3.27, 1.6×). The two scores are about 1.6 standard errors apart, so read that as no measured loss rather than a gain.
 - Budget keeps Opus 5.5 medium (90.86, 23/23, measured $2.84). This is the maintainer's choice to keep Budget's defaults on cells with a measured cost. To try Grok there, override `hardest tasks` to `pv-grok-high` with `/setup-pvstack`: 92.71 at an estimated $2.19.
 
 ### Search and mechanical work: Sol @ low (Balanced), DeepSeek V4.1 Flash @ low (Budget)
@@ -162,10 +166,13 @@ The mode sheets in `plugins/pvstack/skills/setup-pvstack/modes/` are generated. 
 - Swarm workers write code, so every preset resolves them with its code rule. In Budget and Open that is `pv-ds-high`, for the reasons in [Measured in Droid](#measured-in-droid).
 - Balanced's OpenAI panel seat sits on a 0.05-point margin. Sol xhigh is 0.55 points above Sol high, and the rule allows 0.5. Any threshold has an edge somewhere. Here the edge is guarded, because `npm run check` warns when the board moves and fails when a regenerated sheet changes.
 
-### Review panels: Opus 5.5, GPT-6.1 Sol, Grok 4.7 @ high
+### Review panels: Haiku 5.5 @ xhigh, GPT-6.1 Sol, Grok 4.7 @ high
 - Panels get their signal from model diversity: findings that independent models agree on carry more weight. This uses three labs: Anthropic, OpenAI and xAI.
+- Claude Haiku 5.5 takes the Anthropic seat from Opus 5.5. VulcanBench added it on the 2026-10-16 board. At xhigh it scores 91.83 (SE 0.39, 22/23, $0.84, 19.0 min), and at max it scores 92.16, the top Anthropic cell. Every Opus 5.5 level scores lower (high 91.11, medium 90.86). The panel rule takes the cheapest Anthropic cell within 0.5 points of the lab's best, which is Haiku @ xhigh. Droid bills Haiku at 0.04× and Opus at 1.6×. Haiku's per-task API cost is under a third of Opus @ medium's, so the seat costs about 1/40 of the credits for the same tokens.
+- Haiku @ xhigh missed one of 23 tasks, and Opus @ medium passed all 23. Panels have no pass filter, because a reviewer's findings are checked by the other seats and by the synthesizer.
+- Fast keeps Opus @ medium on its panels. Its rule takes the fastest cell that passed all but one task, and Opus @ medium (18.6 min) edges out Haiku @ xhigh (19.0 min). Quality takes Haiku @ max, the top Anthropic score.
 - Grok sits at high. It scores 92.71 (SE 0.41), uses the fewest tokens of any Grok level (2.85M per task) and has the lowest estimated cost ($2.19). Medium, the earlier pick, scores 92.30 but had the sweep's one 3-hour timeout, so its token and cost figures cover 22 runs. Medium came from Grok 4.6, whose effort knob ran backward. Grok 4.7's combined score rises at every step.
-- In Budget, Opus leaves the fan-out (Opus @ medium costs about 9× Sol @ high per task, $2.84 vs $0.33) and DeepSeek takes its seat. Opus stays in the arena cross-judge pool and still writes every synthesis.
+- In Budget, Opus leaves the fan-out (Opus @ medium costs about 9× Sol @ high per task, $2.84 vs $0.33) and DeepSeek takes its seat. Haiku @ xhigh takes the Anthropic seat in the arena cross-judge pool, and Opus still writes every synthesis.
 - Budget's DeepSeek seat is `pv-ds-low`. Once max is out, low and high are within a point of each other on v3, and the rule takes the cheaper one. The Droid run shows no measurable difference between them (85.5% vs 86.8% resolved, with overlapping ranges across repeats).
 
 ## Rejected for Budget mode

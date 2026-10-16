@@ -14,7 +14,8 @@ These files are listed in `plugins/pvstack/.upstream-files.json`:
 
 - Cursor paths, tool names and the model-rule filename are rewritten (see `REWRITES` in `tools/sync-upstream.mjs`).
 - Each skill that names a Cursor tool or model slug gets a one-line pointer to `droid-tools.md`.
-- Cursor agents are converted to Droid droids: the name is normalized, `model: inherit` is added, and Cursor-only keys are removed.
+- Cursor agents are converted to Droid droids: the name is normalized, `model: inherit` is added, and Cursor-only keys are removed. `poteto-agent` loads `poteto-delegate` instead of the whole `poteto-mode` skill.
+- `plugins/pvstack/skills/poteto-delegate/SKILL.md` is generated from four sections of `poteto-mode/SKILL.md` (Principles, Autonomy, Writing the reply, Comments) under a short pvstack header.
 - `setup-pstack` and the Benny automation pack are not included.
 
 ## Files written for pvstack

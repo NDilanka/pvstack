@@ -30,6 +30,15 @@ export const MODELS = {
     safety: { followed: 3, total: 100, reported: 64 },
     levels: ["low", "medium", "high", "xhigh", "max"],
   },
+  "claude-haiku-5-5": {
+    vbName: "Claude Haiku 5.5",
+    boardName: "Haiku 5.5",
+    lab: "Anthropic",
+    multiplier: 0.04,
+    openWeights: false,
+    safety: null,
+    levels: ["off", "low", "medium", "high", "xhigh", "max"],
+  },
   "grok-4.7": {
     vbName: "Grok 4.7",
     boardName: "Grok 4.7",
