@@ -1,5 +1,5 @@
 {
-  "pulled": "2026-10-06",
+  "pulled": "2026-10-16",
   "sources": {
     "frontier": "https://vulcanbench.com/assets/data/swe-v4-board.csv",
     "routine": "https://vulcanbench.com/assets/data/routine-v1-board.csv"
@@ -52,6 +52,36 @@
     },
     {
       "rank": 4,
+      "model": "Haiku 5.5",
+      "lab": "Anthropic",
+      "harness": "Claude Code",
+      "effort": "max",
+      "n": 21,
+      "passed": 22,
+      "passed_of": 23,
+      "score": 92.1599,
+      "se": 0.3681,
+      "code_quality": 81.3005,
+      "minutes": 27.6751,
+      "usd": 1.53611
+    },
+    {
+      "rank": 5,
+      "model": "Sonnet 5.5",
+      "lab": "Anthropic",
+      "harness": "Claude Code",
+      "effort": "max",
+      "n": 23,
+      "passed": 23,
+      "passed_of": 23,
+      "score": 92.0184,
+      "se": 0.3546,
+      "code_quality": 81.7158,
+      "minutes": 37.9756,
+      "usd": 5.519631
+    },
+    {
+      "rank": 6,
       "model": "Fable 5.1",
       "lab": "Anthropic",
       "harness": "Claude Code",
@@ -66,7 +96,22 @@
       "usd": 9.058763
     },
     {
-      "rank": 5,
+      "rank": 7,
+      "model": "Haiku 5.5",
+      "lab": "Anthropic",
+      "harness": "Claude Code",
+      "effort": "xhigh",
+      "n": 22,
+      "passed": 22,
+      "passed_of": 23,
+      "score": 91.8273,
+      "se": 0.3934,
+      "code_quality": 80.1252,
+      "minutes": 18.967,
+      "usd": 0.839402
+    },
+    {
+      "rank": 8,
       "model": "Opus 5.5",
       "lab": "Anthropic",
       "harness": "Claude Code",
@@ -81,7 +126,7 @@
       "usd": 3.269444
     },
     {
-      "rank": 6,
+      "rank": 9,
       "model": "Opus 5.5",
       "lab": "Anthropic",
       "harness": "Claude Code",
@@ -96,7 +141,7 @@
       "usd": 2.842201
     },
     {
-      "rank": 7,
+      "rank": 10,
       "model": "Fable 5.1",
       "lab": "Anthropic",
       "harness": "Claude Code",
@@ -111,7 +156,7 @@
       "usd": 14.485635
     },
     {
-      "rank": 8,
+      "rank": 11,
       "model": "Opus 5.5",
       "lab": "Anthropic",
       "harness": "Claude Code",
@@ -126,7 +171,7 @@
       "usd": 4.111557
     },
     {
-      "rank": 9,
+      "rank": 12,
       "model": "Opus 5.5",
       "lab": "Anthropic",
       "harness": "Claude Code",
@@ -141,7 +186,22 @@
       "usd": 8.748014
     },
     {
-      "rank": 10,
+      "rank": 13,
+      "model": "Sonnet 5.5",
+      "lab": "Anthropic",
+      "harness": "Claude Code",
+      "effort": "xhigh",
+      "n": 23,
+      "passed": 22,
+      "passed_of": 23,
+      "score": 90.2037,
+      "se": 0.5684,
+      "code_quality": 75.7848,
+      "minutes": 21.5946,
+      "usd": 3.375358
+    },
+    {
+      "rank": 14,
       "model": "Fable 5.1",
       "lab": "Anthropic",
       "harness": "Claude Code",
@@ -156,7 +216,7 @@
       "usd": 9.18601
     },
     {
-      "rank": 11,
+      "rank": 15,
       "model": "Fable 5.1",
       "lab": "Anthropic",
       "harness": "Claude Code",
@@ -171,7 +231,7 @@
       "usd": 9.701575
     },
     {
-      "rank": 12,
+      "rank": 16,
       "model": "Grok 4.7",
       "lab": "xAI",
       "harness": "Cursor",
@@ -186,7 +246,7 @@
       "usd": null
     },
     {
-      "rank": 13,
+      "rank": 17,
       "model": "GPT-6 Astra",
       "lab": "OpenAI",
       "harness": "Codex",
@@ -201,7 +261,7 @@
       "usd": 2.568128
     },
     {
-      "rank": 14,
+      "rank": 18,
       "model": "GPT-6 Astra",
       "lab": "OpenAI",
       "harness": "Codex",
@@ -216,7 +276,7 @@
       "usd": 2.302022
     },
     {
-      "rank": 15,
+      "rank": 19,
       "model": "Fable 5.1",
       "lab": "Anthropic",
       "harness": "Claude Code",
@@ -231,7 +291,7 @@
       "usd": 7.963719
     },
     {
-      "rank": 16,
+      "rank": 20,
       "model": "GPT-5.6 Terra",
       "lab": "OpenAI",
       "harness": "Codex",
@@ -246,7 +306,7 @@
       "usd": 1.8822
     },
     {
-      "rank": 17,
+      "rank": 21,
       "model": "GPT-6.1 Sol",
       "lab": "OpenAI",
       "harness": "Codex",
@@ -261,7 +321,7 @@
       "usd": 0.434591
     },
     {
-      "rank": 18,
+      "rank": 22,
       "model": "GPT-6.1 Sol",
       "lab": "OpenAI",
       "harness": "Codex",
@@ -276,7 +336,7 @@
       "usd": 0.458339
     },
     {
-      "rank": 19,
+      "rank": 23,
       "model": "GPT-6.1 Sol",
       "lab": "OpenAI",
       "harness": "Codex",
@@ -291,7 +351,7 @@
       "usd": 0.33007
     },
     {
-      "rank": 20,
+      "rank": 24,
       "model": "GPT-6 Astra",
       "lab": "OpenAI",
       "harness": "Codex",
@@ -306,7 +366,22 @@
       "usd": 1.711065
     },
     {
-      "rank": 21,
+      "rank": 25,
+      "model": "Haiku 5.5",
+      "lab": "Anthropic",
+      "harness": "Claude Code",
+      "effort": "high",
+      "n": 23,
+      "passed": 17,
+      "passed_of": 23,
+      "score": 88.015,
+      "se": 1.42,
+      "code_quality": 77.5959,
+      "minutes": 26.819,
+      "usd": 1.247401
+    },
+    {
+      "rank": 26,
       "model": "GPT-6 Astra",
       "lab": "OpenAI",
       "harness": "Codex",
@@ -321,7 +396,7 @@
       "usd": 1.481347
     },
     {
-      "rank": 22,
+      "rank": 27,
       "model": "GPT-6 Astra",
       "lab": "OpenAI",
       "harness": "Codex",
@@ -336,7 +411,7 @@
       "usd": 1.721698
     },
     {
-      "rank": 23,
+      "rank": 28,
       "model": "GPT-5.6 Sol",
       "lab": "OpenAI",
       "harness": "Codex",
@@ -351,7 +426,7 @@
       "usd": 1.773526
     },
     {
-      "rank": 24,
+      "rank": 29,
       "model": "GPT-6 Sol",
       "lab": "OpenAI",
       "harness": "Codex",
@@ -366,7 +441,22 @@
       "usd": 2.520618
     },
     {
-      "rank": 25,
+      "rank": 30,
+      "model": "Sonnet 5.5",
+      "lab": "Anthropic",
+      "harness": "Claude Code",
+      "effort": "high",
+      "n": 23,
+      "passed": 20,
+      "passed_of": 23,
+      "score": 86.7923,
+      "se": 1.1498,
+      "code_quality": 70.8384,
+      "minutes": 14.8199,
+      "usd": 2.390423
+    },
+    {
+      "rank": 31,
       "model": "GPT-5.6 Sol",
       "lab": "OpenAI",
       "harness": "Codex",
@@ -381,7 +471,7 @@
       "usd": 1.609172
     },
     {
-      "rank": 26,
+      "rank": 32,
       "model": "GPT-6.1 Sol",
       "lab": "OpenAI",
       "harness": "Codex",
@@ -396,7 +486,7 @@
       "usd": 0.3986
     },
     {
-      "rank": 27,
+      "rank": 33,
       "model": "Opus 5.5",
       "lab": "Anthropic",
       "harness": "Claude Code",
@@ -411,7 +501,7 @@
       "usd": 1.695309
     },
     {
-      "rank": 28,
+      "rank": 34,
       "model": "GPT-6.1 Sol",
       "lab": "OpenAI",
       "harness": "Codex",
@@ -426,7 +516,7 @@
       "usd": 0.305976
     },
     {
-      "rank": 29,
+      "rank": 35,
       "model": "GPT-6 Sol",
       "lab": "OpenAI",
       "harness": "Codex",
@@ -441,7 +531,7 @@
       "usd": 1.996273
     },
     {
-      "rank": 30,
+      "rank": 36,
       "model": "GPT-5.6 Sol",
       "lab": "OpenAI",
       "harness": "Codex",
@@ -456,7 +546,22 @@
       "usd": 2.045316
     },
     {
-      "rank": 31,
+      "rank": 37,
+      "model": "Haiku 5.5",
+      "lab": "Anthropic",
+      "harness": "Claude Code",
+      "effort": "low",
+      "n": 23,
+      "passed": 13,
+      "passed_of": 23,
+      "score": 84.4242,
+      "se": 1.9742,
+      "code_quality": 74.827,
+      "minutes": 22.9129,
+      "usd": 1.035486
+    },
+    {
+      "rank": 38,
       "model": "GPT-5.6 Luna",
       "lab": "OpenAI",
       "harness": "Codex",
@@ -471,7 +576,37 @@
       "usd": 0.448386
     },
     {
-      "rank": 32,
+      "rank": 39,
+      "model": "Sonnet 5.5",
+      "lab": "Anthropic",
+      "harness": "Claude Code",
+      "effort": "medium",
+      "n": 23,
+      "passed": 17,
+      "passed_of": 23,
+      "score": 84.0956,
+      "se": 1.1952,
+      "code_quality": 65.35,
+      "minutes": 20.822,
+      "usd": 3.002214
+    },
+    {
+      "rank": 40,
+      "model": "Haiku 5.5",
+      "lab": "Anthropic",
+      "harness": "Claude Code",
+      "effort": "medium",
+      "n": 22,
+      "passed": 13,
+      "passed_of": 23,
+      "score": 84.03,
+      "se": 2.4972,
+      "code_quality": 76.0723,
+      "minutes": 24.0181,
+      "usd": 1.355085
+    },
+    {
+      "rank": 41,
       "model": "GPT-5.6 Terra",
       "lab": "OpenAI",
       "harness": "Codex",
@@ -486,7 +621,7 @@
       "usd": 2.117749
     },
     {
-      "rank": 33,
+      "rank": 42,
       "model": "GPT-6 Sol",
       "lab": "OpenAI",
       "harness": "Codex",
@@ -501,7 +636,7 @@
       "usd": 2.330342
     },
     {
-      "rank": 34,
+      "rank": 43,
       "model": "GPT-5.6 Sol",
       "lab": "OpenAI",
       "harness": "Codex",
@@ -516,7 +651,22 @@
       "usd": 1.715194
     },
     {
-      "rank": 35,
+      "rank": 44,
+      "model": "Sonnet 5.5",
+      "lab": "Anthropic",
+      "harness": "Claude Code",
+      "effort": "low",
+      "n": 23,
+      "passed": 15,
+      "passed_of": 23,
+      "score": 81.6257,
+      "se": 1.3818,
+      "code_quality": 61.6683,
+      "minutes": 19.9548,
+      "usd": 2.876155
+    },
+    {
+      "rank": 45,
       "model": "GPT-6 Luna",
       "lab": "OpenAI",
       "harness": "Codex",
@@ -531,7 +681,7 @@
       "usd": 0.097529
     },
     {
-      "rank": 36,
+      "rank": 46,
       "model": "GPT-6 Sol",
       "lab": "OpenAI",
       "harness": "Codex",
@@ -546,7 +696,7 @@
       "usd": 1.758462
     },
     {
-      "rank": 37,
+      "rank": 47,
       "model": "GPT-5.6 Luna",
       "lab": "OpenAI",
       "harness": "Codex",
@@ -561,7 +711,7 @@
       "usd": 0.274706
     },
     {
-      "rank": 38,
+      "rank": 48,
       "model": "GPT-6 Luna",
       "lab": "OpenAI",
       "harness": "Codex",
@@ -576,7 +726,7 @@
       "usd": 0.159686
     },
     {
-      "rank": 39,
+      "rank": 49,
       "model": "GPT-5.5",
       "lab": "OpenAI",
       "harness": "Codex",
@@ -591,7 +741,7 @@
       "usd": 4.56257
     },
     {
-      "rank": 40,
+      "rank": 50,
       "model": "GPT-5.6 Terra",
       "lab": "OpenAI",
       "harness": "Codex",
@@ -606,7 +756,7 @@
       "usd": 1.183321
     },
     {
-      "rank": 41,
+      "rank": 51,
       "model": "GPT-5.6 Luna",
       "lab": "OpenAI",
       "harness": "Codex",
@@ -621,7 +771,7 @@
       "usd": 0.216769
     },
     {
-      "rank": 42,
+      "rank": 52,
       "model": "GPT-5.5",
       "lab": "OpenAI",
       "harness": "Codex",
@@ -636,7 +786,7 @@
       "usd": 4.197308
     },
     {
-      "rank": 43,
+      "rank": 53,
       "model": "GPT-5.6 Sol",
       "lab": "OpenAI",
       "harness": "Codex",
@@ -651,7 +801,7 @@
       "usd": 1.359168
     },
     {
-      "rank": 44,
+      "rank": 54,
       "model": "GPT-6 Sol",
       "lab": "OpenAI",
       "harness": "Codex",
@@ -666,7 +816,7 @@
       "usd": 1.019456
     },
     {
-      "rank": 45,
+      "rank": 55,
       "model": "GPT-5.6 Terra",
       "lab": "OpenAI",
       "harness": "Codex",
@@ -681,7 +831,7 @@
       "usd": 0.686316
     },
     {
-      "rank": 46,
+      "rank": 56,
       "model": "GPT-5.5",
       "lab": "OpenAI",
       "harness": "Codex",
@@ -696,7 +846,7 @@
       "usd": 2.708066
     },
     {
-      "rank": 47,
+      "rank": 57,
       "model": "GPT-5.6 Terra",
       "lab": "OpenAI",
       "harness": "Codex",
@@ -711,7 +861,7 @@
       "usd": 0.576358
     },
     {
-      "rank": 48,
+      "rank": 58,
       "model": "GPT-6 Luna",
       "lab": "OpenAI",
       "harness": "Codex",
@@ -726,7 +876,7 @@
       "usd": 0.051912
     },
     {
-      "rank": 49,
+      "rank": 59,
       "model": "GPT-5.6 Luna",
       "lab": "OpenAI",
       "harness": "Codex",
@@ -741,7 +891,7 @@
       "usd": 0.066398
     },
     {
-      "rank": 50,
+      "rank": 60,
       "model": "GPT-5.5",
       "lab": "OpenAI",
       "harness": "Codex",
@@ -756,7 +906,7 @@
       "usd": 1.794708
     },
     {
-      "rank": 51,
+      "rank": 61,
       "model": "GPT-6 Luna",
       "lab": "OpenAI",
       "harness": "Codex",
@@ -771,7 +921,7 @@
       "usd": 0.009535
     },
     {
-      "rank": 52,
+      "rank": 62,
       "model": "GPT-5.6 Luna",
       "lab": "OpenAI",
       "harness": "Codex",
@@ -786,7 +936,7 @@
       "usd": 0.023996
     },
     {
-      "rank": 53,
+      "rank": 63,
       "model": "GPT-6 Luna",
       "lab": "OpenAI",
       "harness": "Codex",

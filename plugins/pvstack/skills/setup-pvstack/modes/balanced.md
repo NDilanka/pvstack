@@ -15,8 +15,8 @@ why investigators: pv-sol-low
 why synthesizer: pv-opus-medium
 reflect tooling: pv-sol-xhigh
 reflect judgment, divergent, synthesizer: pv-opus-medium
-arena runners: pv-opus-medium, pv-sol-xhigh, pv-grok-high
-arena cross-judge pool: pv-opus-medium, pv-sol-xhigh, pv-grok-high
+arena runners: pv-haiku-xhigh, pv-sol-xhigh, pv-grok-high
+arena cross-judge pool: pv-haiku-xhigh, pv-sol-xhigh, pv-grok-high
 swarm workers: pv-sol-high
-architect runners: pv-opus-medium, pv-sol-xhigh, pv-grok-high
-interrogate reviewers: pv-opus-medium, pv-sol-xhigh, pv-grok-high
+architect runners: pv-haiku-xhigh, pv-sol-xhigh, pv-grok-high
+interrogate reviewers: pv-haiku-xhigh, pv-sol-xhigh, pv-grok-high

@@ -18,6 +18,8 @@ export const CELLS = [
   { name: "pv-sol-xhigh", model: "gpt-6.1-sol", effort: "xhigh", label: "GPT-6.1 Sol, extra-high effort", use: "Review panels and reflect tooling where Sol's best score matters." },
   { name: "pv-opus-medium", model: "claude-opus-5-5", effort: "medium", label: "Claude Opus 5.5, medium effort", use: "Judgment, prose, explainers, synthesizers, and review panels." },
   { name: "pv-opus-high", model: "claude-opus-5-5", effort: "high", label: "Claude Opus 5.5, high effort", use: "Quality preset judgment, and the hardest changes in the Safe preset." },
+  { name: "pv-haiku-xhigh", model: "claude-haiku-5-5", effort: "xhigh", label: "Claude Haiku 5.5, extra-high effort", use: "The Anthropic seat on review panels." },
+  { name: "pv-haiku-max", model: "claude-haiku-5-5", effort: "max", label: "Claude Haiku 5.5, max effort", use: "Quality preset panels, and the hardest changes in the Safe preset." },
   { name: "pv-grok-high", model: "grok-4.7", effort: "high", label: "Grok 4.7, high effort", use: "Third-lab member of review panels." },
   { name: "pv-grok-xhigh", model: "grok-4.7", effort: "xhigh", label: "Grok 4.7, extra-high effort", use: "The hardest changes: cross-cutting design, concurrency, subtle algorithms." },
   { name: "pv-ds-low", model: "deepseek-v4.1-flash", effort: "low", label: "DeepSeek V4.1 Flash, low effort", use: "Budget mode: exploration and mechanical tasks." },
@@ -35,7 +37,7 @@ reasoningEffort: ${cell.effort}
 
 You are a pvstack subagent running on ${cell.label}. The parent picked you because its role sheet maps the current role to \`${cell.name}\`.
 
-- If the prompt says to operate as \`poteto-agent\`, load the \`poteto-mode\` skill and read its \`SKILL.md\` in full before any work, including the Principles index, then follow it. Open a leaf \`principle-*\` skill whenever you apply that principle. If the Skill tool will not load a skill, read its \`SKILL.md\` from the plugin's \`skills/\` directory instead.
+- If the prompt says to operate as \`poteto-agent\`, load the \`poteto-delegate\` skill before any work and follow it. It is poteto-mode's delegate cut, with the Principles index and the reply and comment rules, and it replaces reading the whole \`poteto-mode\` skill even when the prompt asks for that. Open a leaf \`principle-*\` skill whenever you apply that principle. If the Skill tool will not load a skill, read its \`SKILL.md\` from the plugin's \`skills/\` directory instead.
 - If the prompt marks the task read-only, do not create, edit, or delete files, and do not run commands that change state.
 - Otherwise follow the prompt as written.
 

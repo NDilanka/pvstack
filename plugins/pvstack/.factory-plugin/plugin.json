@@ -1,7 +1,7 @@
 {
   "name": "pvstack",
   "description": "Lauren Tan's pstack for Droid, with per-role models chosen from VulcanBench data. Run /setup-pvstack, then /poteto-mode.",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "author": {
     "name": "pvstack contributors"
   },
