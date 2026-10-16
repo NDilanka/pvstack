@@ -1,6 +1,6 @@
 ---
 name: pv-opus-high
-description: "pvstack role droid pinned to Claude Opus 5.5, high effort. Quality preset judgment and prose. Spawn it when the pvstack role sheet maps a role to pv-opus-high."
+description: "pvstack role droid pinned to Claude Opus 5.5, high effort. Quality preset judgment and prose, and the hardest changes in the Safe preset. Spawn it when the pvstack role sheet maps a role to pv-opus-high."
 model: claude-opus-5-5
 reasoningEffort: high
 ---

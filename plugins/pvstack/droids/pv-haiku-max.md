@@ -1,6 +1,6 @@
 ---
 name: pv-haiku-max
-description: "pvstack role droid pinned to Claude Haiku 5.5, max effort. Quality preset panels, and the hardest changes in the Safe preset. Spawn it when the pvstack role sheet maps a role to pv-haiku-max."
+description: "pvstack role droid pinned to Claude Haiku 5.5, max effort. The Anthropic seat on Quality preset review panels. Spawn it when the pvstack role sheet maps a role to pv-haiku-max."
 model: claude-haiku-5-5
 reasoningEffort: max
 ---
