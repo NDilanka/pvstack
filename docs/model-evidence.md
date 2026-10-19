@@ -180,11 +180,11 @@ The mode sheets in `plugins/pvstack/skills/setup-pvstack/modes/` are generated. 
 
 | Model | Evidence (v3) | Why not |
 | --- | --- | --- |
-| GLM 5.3 (`glm-5.3`, 0.56×) | Low 78.3%. Max, its default, 65.2% in a bare harness. In Z.ai's own ZCode harness, 87.0% at max (Report 18). | Score depends heavily on the harness, and effort works backward outside ZCode. Droid's harness is unmeasured. Revisit after a Droid run. |
+| GLM 5.3 (`glm-5.3`, 0.56×) | Low 78.3%. Max, its default, 65.2% in a bare harness. In Z.ai's own ZCode harness, 87.0% at max (Report 18). | Score depends heavily on the harness, and effort works backward outside ZCode. The Flash variant measured in Droid on 2026-10-19 resolves 79.4% to 82.3% for 5,726 to 16,219 median credits, with max its best level (Measured in Droid). Still under the DeepSeek cells. |
 | Qwen3.8-Max (`qwen3.8-max`, 0.8×) | Low 81.2% at 19.6 min. Its default, xhigh, 55.1% (Report 12). | Slower and weaker than Sol at the same multiplier. |
 | Kimi K3 (`kimi-k3`, 1.2×) | Extra-high 73.7% on 19 of 23 tasks (Report 8). | Lower score at a higher multiplier than Sol. |
 | GPT-6 Luna (0.04×) | v4: max 81.4% with 6 runs hitting the 3-hour timeout, 60 min per task. | Too slow and unreliable on hard tasks. On routine work it is a candidate for a future "mechanical" override. |
-| Other Droid Core models (MiniMax M3, Nemotron 3 Ultra, Inkling, Mistral Medium 3.5, GLM-5.3-Flash) | No VulcanBench data. | No evidence to rank them. |
+| Other Droid Core models (MiniMax M3, Nemotron 3 Ultra, Inkling, Mistral Medium 3.5) | No VulcanBench data. Nemotron 3.5 Super has a Droid-only run (Measured in Droid, 2026-10-19). | Nothing comparable to rank them against the board. Nemotron 3.5 Super resolves under the DeepSeek cells for about 2.9 times GLM 5.3 Flash's credits. |
 
 ## Measured in Droid
 
@@ -193,6 +193,11 @@ pvstack ran VulcanBench's public Python Suite v1 (23 tasks, each from a real ope
 <!-- droid-bench:cells -->
 | Droid | Model / effort | Resolved (range across repeats) | Hidden tests passed | Median min | Median credits | Tasks × repeats |
 | --- | --- | --- | --- | --- | --- | --- |
+| `glm-5.3-flash@high` | GLM 5.3 Flash / high | 79.4% (77.3% to 82.6%) | 93.0% | 3.0 | 7,344 | 23 × 3 (1 infra) |
+| `glm-5.3-flash@low` | GLM 5.3 Flash / low | 80.6% (78.3% to 85.7%) | 93.0% | 2.3 | 5,726 | 23 × 3 (2 infra) |
+| `glm-5.3-flash@max` | GLM 5.3 Flash / max | 82.3% (78.3% to 86.4%) | 93.4% | 4.1 | 16,219 | 23 × 3 (1 infra) |
+| `nemotron-3.5-super@high` | Nemotron 3.5 Super / high | 79.4% (77.3% to 82.6%) | 92.4% | 3.8 | 21,078 | 23 × 3 (1 infra) |
+| `nemotron-3.5-super@low` | Nemotron 3.5 Super / low | 79.4% (73.9% to 87.0%) | 92.6% | 3.1 | 20,537 | 23 × 3 (1 infra) |
 | `pv-ds-high` | DeepSeek V4.1 Flash / high | 86.8% (82.6% to 90.9%) | 95.5% | 1.2 | 14,272 | 23 × 3 (1 infra) |
 | `pv-ds-low` | DeepSeek V4.1 Flash / low | 85.5% (78.3% to 91.3%) | 95.0% | 1.0 | 11,558 | 23 × 3 (0 infra) |
 | `pv-ds-max` | DeepSeek V4.1 Flash / max | 84.9% (82.6% to 86.4%) | 94.6% | 2.3 | 32,797 | 23 × 3 (3 infra) |
@@ -206,7 +211,7 @@ How to read it:
 - **The grader is checked.** Before any model ran, every task's untouched repository failed its `fail_to_pass` tests and passed its `pass_to_pass` tests, and the gold patch passed all of them (23 of 23 tasks).
 - **Credits are what Droid bills.** They come from `droid exec`'s usage report. Medians are per run.
 - **The agents couldn't run the hidden test environment.** Tests ran afterwards in a separate virtualenv. The agent's shell started with system Python, which has no pytest or task dependencies. That holds every cell back equally. Two tasks failed for every cell on every run (`oss-click-param-named-help` and `oss-sqlglot-canonicalize-internal-names`), and a third (`oss-pennylane-trotter-fragmented`) passed once in 15 runs. They set the ceiling near 87%.
-- **Infra failures** are 45-minute agent timeouts. They are excluded from the resolved rate. `pv-ds-max` hit three of them and `pv-ds-high` one.
+- **Infra failures** are 45-minute agent timeouts or `droid exec` errors. They are excluded from the resolved rate. `pv-ds-max` hit three of them and `pv-ds-high` one. The 2026-10-19 candidate run below hit six: five `droid exec` errors, two of them `droid.exe` allocation crashes under concurrency on an 8 GB Windows host, plus one agent timeout.
 
 What it changed:
 
@@ -217,3 +222,9 @@ What it changed:
 - **Sol low and Sol high tie here.** Balanced keeps Sol high for code, because Frontier v4's three hard-task failures for Sol low are a real gap and the Python suite is too easy to show it. The filter needs strictly more resolved tasks, so the tie doesn't remove Sol high.
 
 Still open: Grok 4.7's unpublished cost, and the Grok Build run VulcanBench has announced. Re-run with `node tools/droid-bench.mjs run --suite <VulcanBench>/tasks/python-1 --python <venv>/bin --cells <cells> --repeats 3`. It resumes from the run log.
+
+**2026-10-19 candidate run: GLM 5.3 Flash and Nemotron 3.5 Super.** Same suite, 23 tasks × 3 repeats per cell, run in Droid on a Windows host with test grading inside WSL, all five new cells on Droid CLI 0.244.0 while the controls ran earlier on 0.233.0. The harness effect of that CLI gap is unmeasured, so treat cross-era comparisons as priors. Verdicts:
+- **GLM 5.3 Flash is the cheapest cell measured here and the strongest of the two candidates, but it doesn't take a seat.** The point estimates land at 79.4% to 82.3% against the DeepSeek cells' 84.9% to 86.8%, while the repeat ranges still overlap (78.3% to 86.4% across the GLM levels). Low effort costs 5,726 median credits, about half of `pv-ds-low`. Max is its best level (82.3%) at 2.8 times low's credits, so the effort knob points up, unlike GLM 5.3's backward dial on v3.
+- **Nemotron 3.5 Super resolves the same tasks as GLM high (79.4%) for about 2.9 times the credits** (21,078 vs 7,344 median at high). Nothing here justifies a seat over the GLM cells, let alone DeepSeek.
+- **No preset changes.** No candidate beats a seated cell on the preset rules, so the candidates stay out of `CELLS` and remain bench-only rows above.
+- The two universal failures (`oss-click-param-named-help`, `oss-sqlglot-canonicalize-internal-names`) failed for every new cell too, and `oss-pennylane-trotter-fragmented` passed zero of 14 graded runs (the controls passed it once).

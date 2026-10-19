@@ -57,6 +57,10 @@ export const MODELS = {
     safety: null,
     levels: ["off", "low", "high", "max"],
   },
+  // Measured in Droid only (no VulcanBench board row): bench-only cells named
+  // `<model>@<effort>` in data/droid-bench.json reference these entries.
+  "glm-5.3-flash": { vbName: "GLM 5.3 Flash", lab: "Z.ai" },
+  "nemotron-3.5-super": { vbName: "Nemotron 3.5 Super", lab: "NVIDIA" },
 };
 
 /** Retired SWE v3 board, where the model is listed as V4-Flash. Scores here are not comparable with Frontier v4. */

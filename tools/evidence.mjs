@@ -12,6 +12,7 @@ import { fileURLToPath } from "node:url";
 import { MODELS, V3_NOTE } from "../data/catalog.mjs";
 import { GROUPS, PRESETS, classOf, resolveSheet, ruleFor, ruleText, ROLES, shippedCells } from "./presets.mjs";
 import { loadSnapshot } from "./vulcanbench.mjs";
+import { benchCell } from "./droids.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const docPath = path.join(root, "docs", "model-evidence.md");
@@ -29,9 +30,11 @@ const pct = (x) => `${(x * 100).toFixed(1)}%`;
 function droidTable(cells) {
   const bench = JSON.parse(fs.readFileSync(droidBenchPath, "utf8"));
   const rows = Object.entries(bench.cells).map(([name, b]) => {
-    const cell = cells.find((c) => c.name === name);
+    const { model: modelKey, effort } = benchCell(name, cells);
+    const model = MODELS[modelKey];
+    if (!model) throw new Error(`${name}: ${modelKey} is not in data/catalog.mjs`);
     const range = b.resolvedRateRange[0] === b.resolvedRateRange[1] ? "" : ` (${pct(b.resolvedRateRange[0])} to ${pct(b.resolvedRateRange[1])})`;
-    return `| \`${name}\` | ${MODELS[cell.model].vbName} / ${cell.effort} | ${pct(b.resolvedRate)}${range} | ${pct(b.functional)} | ${b.medianMinutes.toFixed(1)} | ${b.medianCredits == null ? "n/a" : Math.round(b.medianCredits).toLocaleString("en-US")} | ${b.tasks} × ${b.repeats} (${b.infraFailures} infra) |`;
+    return `| \`${name}\` | ${model.vbName} / ${effort} | ${pct(b.resolvedRate)}${range} | ${pct(b.functional)} | ${b.medianMinutes.toFixed(1)} | ${b.medianCredits == null ? "n/a" : Math.round(b.medianCredits).toLocaleString("en-US")} | ${b.tasks} × ${b.repeats} (${b.infraFailures} infra) |`;
   });
   return [
     "| Droid | Model / effort | Resolved (range across repeats) | Hidden tests passed | Median min | Median credits | Tasks × repeats |",

@@ -27,6 +27,15 @@ export const CELLS = [
   { name: "pv-ds-max", model: "deepseek-v4.1-flash", effort: "max", label: "DeepSeek V4.1 Flash, max effort", use: "Budget mode: code delegates and review panels." },
 ];
 
+/** Resolves a bench cell by name: a CELLS entry, or a `model@effort` candidate with no board row. */
+export function benchCell(name, cells = CELLS) {
+  const known = cells.find((c) => c.name === name);
+  if (known) return known;
+  const at = name.lastIndexOf("@");
+  if (at <= 0) throw new Error(`invalid bench cell name ${name}`);
+  return { name, model: name.slice(0, at), effort: name.slice(at + 1) };
+}
+
 function render(cell) {
   return `---
 name: ${cell.name}

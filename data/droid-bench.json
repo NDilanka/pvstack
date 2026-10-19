@@ -3,6 +3,76 @@
   "harness": "droid exec --auto high",
   "metric": "hidden-test resolution, functional only",
   "cells": {
+    "glm-5.3-flash@high": {
+      "runs": 69,
+      "infraFailures": 1,
+      "resolvedRate": 0.7941,
+      "resolvedRateRange": [
+        0.7727,
+        0.8261
+      ],
+      "functional": 0.9295,
+      "medianMinutes": 2.98,
+      "medianCredits": 7343.5,
+      "tasks": 23,
+      "repeats": 3
+    },
+    "glm-5.3-flash@low": {
+      "runs": 69,
+      "infraFailures": 2,
+      "resolvedRate": 0.806,
+      "resolvedRateRange": [
+        0.7826,
+        0.8571
+      ],
+      "functional": 0.93,
+      "medianMinutes": 2.33,
+      "medianCredits": 5726,
+      "tasks": 23,
+      "repeats": 3
+    },
+    "glm-5.3-flash@max": {
+      "runs": 69,
+      "infraFailures": 1,
+      "resolvedRate": 0.8235,
+      "resolvedRateRange": [
+        0.7826,
+        0.8636
+      ],
+      "functional": 0.9343,
+      "medianMinutes": 4.13,
+      "medianCredits": 16218.5,
+      "tasks": 23,
+      "repeats": 3
+    },
+    "nemotron-3.5-super@high": {
+      "runs": 69,
+      "infraFailures": 1,
+      "resolvedRate": 0.7941,
+      "resolvedRateRange": [
+        0.7727,
+        0.8261
+      ],
+      "functional": 0.9237,
+      "medianMinutes": 3.75,
+      "medianCredits": 21077.5,
+      "tasks": 23,
+      "repeats": 3
+    },
+    "nemotron-3.5-super@low": {
+      "runs": 69,
+      "infraFailures": 1,
+      "resolvedRate": 0.7941,
+      "resolvedRateRange": [
+        0.7391,
+        0.8696
+      ],
+      "functional": 0.9258,
+      "medianMinutes": 3.12,
+      "medianCredits": 20537,
+      "tasks": 23,
+      "repeats": 3
+    },
     "pv-ds-high": {
       "runs": 69,
       "infraFailures": 1,

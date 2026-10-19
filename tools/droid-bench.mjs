@@ -6,18 +6,31 @@
 //   node tools/droid-bench.mjs validate --suite <VulcanBench>/tasks/python-1 --python <venv>/bin
 //   node tools/droid-bench.mjs run --suite ... --python ... --cells pv-ds-low,pv-sol-high --repeats 3 --jobs 6
 //   node tools/droid-bench.mjs summarize        rewrite data/droid-bench.json from the run log
+//
+// The suite's hidden tests are bash scripts, so on Windows the grader runs them through
+// wsl.exe (`--python` is a directory inside WSL then); droid itself runs natively, where its
+// auth lives. On other platforms everything runs natively.
 
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { spawn } from "node:child_process";
 import { fileURLToPath } from "node:url";
-import { CELLS } from "./droids.mjs";
+import { benchCell } from "./droids.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const runLog = path.join(root, "data", "droid-bench-runs.jsonl");
 const summaryFile = path.join(root, "data", "droid-bench.json");
 const AGENT_TIMEOUT_MS = 45 * 60 * 1000;
+// DROID_BIN pins the droid executable (default: `droid` from PATH). All cells in a comparison
+// should run on one CLI build; harness version is a measured variable.
+const DROID_BIN = process.env.DROID_BIN ?? "droid";
+
+// The suite, its hidden tests and the harness are Linux-first (bash per test, /usr/bin/python3
+// in WSL), so on Windows the agent and the grader run through wsl.exe on the same /tmp copies.
+const WSL = process.platform === "win32";
+const shq = (s) => `'${s.replaceAll("'", `'\\''`)}'`;
+const wslPath = (p) => (/^[A-Za-z]:/.test(p) ? `/mnt/${p[0].toLowerCase()}/${p.slice(3).replaceAll("\\", "/")}` : p);
 
 const PROMPT = (issue) => `${issue.trim()}
 
@@ -35,7 +48,7 @@ function args() {
 
 function sh(cmd, argv, { cwd, env, timeoutMs } = {}) {
   return new Promise((resolve) => {
-    const child = spawn(cmd, argv, { cwd, env: { ...process.env, ...env }, stdio: ["ignore", "pipe", "pipe"], detached: true });
+    const child = spawn(cmd, argv, { cwd, env: { ...process.env, ...env }, stdio: ["ignore", "pipe", "pipe"], detached: true, windowsHide: true });
     let stdout = "";
     let stderr = "";
     let timedOut = false;
@@ -73,30 +86,53 @@ async function initGit(dir) {
   await sh("git", ["-c", "user.email=bench@local", "-c", "user.name=bench", "commit", "-q", "-m", "base"], { cwd: dir });
 }
 
+async function runTests(task, dir, python) {
+  const timeoutMs = (task.meta.test_timeout_s ?? 120) * 1000;
+  const results = {};
+  for (const kind of ["fail_to_pass", "pass_to_pass"]) {
+    results[kind] = [];
+    for (const t of task.meta.tests[kind] ?? []) {
+      const r = WSL
+        ? await sh("wsl.exe", ["-e", "bash", "-lc", `cd ${dir} && PATH=${shq(python)}:$PATH ${t.cmd}`], { env: { WSL_UTF8: "1" }, timeoutMs })
+        : await sh("bash", ["-c", t.cmd], { cwd: dir, env: { PATH: `${python}:${process.env.PATH}`, PYTHONDONTWRITEBYTECODE: "1" }, timeoutMs });
+      results[kind].push({ name: t.name, ok: r.code === 0 && !r.timedOut });
+    }
+  }
+  const all = [...results.fail_to_pass, ...results.pass_to_pass];
+  return {
+    f2p: results.fail_to_pass.filter((t) => t.ok).length,
+    f2pTotal: results.fail_to_pass.length,
+    p2p: results.pass_to_pass.filter((t) => t.ok).length,
+    p2pTotal: results.pass_to_pass.length,
+    functional: all.filter((t) => t.ok).length / all.length,
+    resolved: all.every((t) => t.ok),
+  };
+}
+
 async function grade(task, repoDir, python) {
   const gradeDir = fs.mkdtempSync(path.join(os.tmpdir(), "dbg-"));
   try {
     fs.cpSync(repoDir, gradeDir, { recursive: true, filter: (src) => !src.includes(`${path.sep}.git`) });
     fs.cpSync(path.join(task.dir, "tests"), gradeDir, { recursive: true });
-    const env = { PATH: `${python}:${process.env.PATH}`, PYTHONDONTWRITEBYTECODE: "1" };
-    const timeoutMs = (task.meta.test_timeout_s ?? 120) * 1000;
-    const results = {};
-    for (const kind of ["fail_to_pass", "pass_to_pass"]) {
-      results[kind] = [];
-      for (const t of task.meta.tests[kind] ?? []) {
-        const r = await sh("bash", ["-c", t.cmd], { cwd: gradeDir, env, timeoutMs });
-        results[kind].push({ name: t.name, ok: r.code === 0 && !r.timedOut });
-      }
+    if (!WSL) return await runTests(task, gradeDir, python);
+    // Grade inside WSL-native storage: pytest cannot collect test files through /mnt when
+    // the suite's `-c /dev/null` makes its rootdir /dev (crossing the drvfs boundary loses them).
+    // The copy first lands on NTFS because the agent's repo already lives there.
+    const stage = `~/droid-bench-grade/${task.id}-${process.pid}-${Math.random().toString(36).slice(2, 8)}`;
+    // wsl.exe starts fail transiently under concurrency (non-zero exit, empty stderr). Retry.
+    let staged = null;
+    for (let attempt = 1; attempt <= 3; attempt++) {
+      staged = await sh("wsl.exe", ["-e", "bash", "-lc", `rm -rf ${stage} && mkdir -p ${stage} && cp -a ${shq(wslPath(gradeDir))}/. ${stage}/`], { env: { WSL_UTF8: "1" } });
+      if (staged.code === 0) break;
+      await new Promise((r) => setTimeout(r, 5000));
     }
-    const all = [...results.fail_to_pass, ...results.pass_to_pass];
-    return {
-      f2p: results.fail_to_pass.filter((t) => t.ok).length,
-      f2pTotal: results.fail_to_pass.length,
-      p2p: results.pass_to_pass.filter((t) => t.ok).length,
-      p2pTotal: results.pass_to_pass.length,
-      functional: all.filter((t) => t.ok).length / all.length,
-      resolved: all.every((t) => t.ok),
-    };
+    if (staged.code !== 0) throw new Error(`grade staging failed: ${staged.stderr.slice(-400)}`);
+    try {
+      return await runTests(task, stage, python);
+    } finally {
+      const cleaned = await sh("wsl.exe", ["-e", "bash", "-lc", `rm -rf ${stage}`], { env: { WSL_UTF8: "1" }, timeoutMs: 60_000 });
+      if (cleaned.code !== 0 || cleaned.timedOut) console.warn(`WARNING: could not remove ${stage}; left in place.`);
+    }
   } finally {
     fs.rmSync(gradeDir, { recursive: true, force: true });
   }
@@ -111,7 +147,11 @@ async function validate(opts) {
       copyRepo(task, repo);
       await initGit(repo);
       const empty = await grade(task, repo, opts.python);
-      const applied = await sh("git", ["apply", path.join(task.dir, "gold_patch.diff")], { cwd: repo });
+      // The suite checkout carries the gold patch with CRLF (it was cloned on Windows); the
+      // patch context is LF, so git apply rejects it without normalization.
+      const patchFile = path.join(work, "gold.diff");
+      fs.writeFileSync(patchFile, fs.readFileSync(path.join(task.dir, "gold_patch.diff"), "utf8").replaceAll("\r\n", "\n"));
+      const applied = await sh("git", ["apply", patchFile], { cwd: repo });
       const gold = await grade(task, repo, opts.python);
       const ok = applied.code === 0 && gold.resolved && empty.f2p === 0 && empty.p2p === empty.p2pTotal;
       if (!ok) bad++;
@@ -145,7 +185,7 @@ async function runOne(task, cell, rep, python) {
     const promptFile = path.join(work, "prompt.md");
     fs.writeFileSync(promptFile, PROMPT(fs.readFileSync(path.join(task.dir, "issue.md"), "utf8")));
     const started = Date.now();
-    const r = await sh("droid", ["exec", "-m", cell.model, "-r", cell.effort, "--auto", "high", "-o", "json", "--cwd", repo, "-f", promptFile], {
+    const r = await sh(DROID_BIN, ["exec", "-m", cell.model, "-r", cell.effort, "--auto", "high", "-o", "json", "--cwd", repo, "-f", promptFile], {
       cwd: repo,
       timeoutMs: AGENT_TIMEOUT_MS,
     });
@@ -165,7 +205,9 @@ async function runOne(task, cell, rep, python) {
 
 async function run(opts) {
   const tasks = loadTasks(opts.suite).filter((t) => !opts.tasks || opts.tasks.split(",").includes(t.id));
-  const cells = opts.cells.split(",").map((name) => CELLS.find((c) => c.name === name) ?? (() => { throw new Error(`unknown cell ${name}`); })());
+  // Cells from CELLS by name, or `model@effort` candidates with no board row yet (not in CELLS,
+  // so no droid file and no sheet entry until the numbers justify one).
+  const cells = opts.cells.split(",").map((name) => benchCell(name));
   const repeats = Number(opts.repeats ?? 1);
   const done = new Set(readRuns().map((r) => `${r.task}|${r.cell}|${r.rep}`));
   const queue = [];
@@ -177,7 +219,14 @@ async function run(opts) {
   const worker = async () => {
     while (queue.length) {
       const { task, cell, rep } = queue.shift();
-      const result = await runOne(task, cell, rep, opts.python);
+      let result;
+      try {
+        result = await runOne(task, cell, rep, opts.python);
+      } catch (error) {
+        // A skipped run is not logged, so the next `run` invocation retries it.
+        console.log(`[skip] ${cell.name} ${task.id} #${rep}: ${error.message.slice(0, 200)}`);
+        continue;
+      }
       fs.appendFileSync(runLog, JSON.stringify(result) + "\n");
       finished++;
       console.log(`[${finished}] ${result.resolved ? "PASS" : "fail"} ${cell.name} ${task.id} #${rep} ${result.minutes} min${result.timedOut ? " TIMEOUT" : ""}${result.agentError ? " AGENT-ERROR" : ""}`);
