@@ -4,8 +4,8 @@ pvstack tracks Lauren Tan's pstack directly from Cursor's plugin repository.
 
 - Repository: https://github.com/cursor/plugins
 - Path: `pstack/`
-- Commit: `bf0c7cd80abdbf7fe47b634978a7d1b4071f71a7`
-- Upstream version: 0.15.42
+- Commit: `ca782ed8b3c2c521cead8e1720d55c3a5dbf2347`
+- Upstream version: 0.15.48
 
 Update with `node tools/sync-upstream.mjs --ref main`, review the diff, then commit.
 `node tools/sync-upstream.mjs --check` fails when the tree has drifted from this pin.
@@ -17,5 +17,5 @@ Update with `node tools/sync-upstream.mjs --ref main`, review the diff, then com
 - Sets each skill's `name` to its directory name, the lowercase slug Droid expects (`Poteto Mode` becomes `poteto-mode`).
 - Keeps upstream's executable bits; `--check` compares them against the git index.
 - Adds a one-line pointer to `droid-tools.md` at the top of each skill that names a Cursor tool or model slug.
-- Generates the `poteto-delegate` skill from the Principles, Autonomy, Writing the reply and Comments sections of `poteto-mode/SKILL.md`. Subagents load it instead of the whole skill, and the bundled `poteto-agent` droid is rewritten to point at it.
+- Generates the `poteto-delegate` skill from the Principles, Autonomy and Writing the reply sections of `poteto-mode/SKILL.md`. Subagents load it instead of the whole skill, and the bundled `poteto-agent` droid is rewritten to point at it.
 - Leaves the Benny automation pack out: it is wired to Cursor automations.

@@ -1,6 +1,6 @@
 ---
 name: poteto-agent
-description: Delegate subagent for code-writing and helper tasks spawned during a `/poteto-mode` run. Use for delegates, not as the runner for `/poteto-mode` itself. Spawn a fresh `poteto-agent` for each new task, and resume one only in the strict cases that poteto-mode's Subagents section names. Loads the `poteto-delegate` skill (poteto-mode's Principles index, reply and comment rules) before any work. Substituting `generalPurpose` skips that load and drifts.
+description: Delegate subagent for code-writing and helper tasks spawned during a `/poteto-mode` run. Use for delegates, not as the runner for `/poteto-mode` itself. Spawn a fresh `poteto-agent` for each new task, and resume one only in the strict cases that poteto-mode's Subagents section names. Loads the `poteto-delegate` skill (poteto-mode's Principles index and reply rules) before any work. Substituting `generalPurpose` skips that load and drifts.
 model: inherit
 ---
 
